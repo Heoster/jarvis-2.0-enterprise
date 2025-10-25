@@ -1,0 +1,121 @@
+# Core AI Frameworks
+google-cloud-dialogflow>=2.25.0
+opencv-python>=4.8.0
+opencv-contrib-python>=4.8.0
+
+# NLP Libraries
+spacy>=3.7.0
+nltk>=3.8.0
+langdetect>=1.0.9
+dateparser>=1.2.0
+textblob>=0.17.1
+transformers>=4.35.0
+sentence-transformers>=2.2.0
+langchain>=0.1.0
+langchain-community>=0.0.20
+langchain-core>=0.1.0
+
+# Machine Learning
+scikit-learn>=1.3.0
+numpy>=1.24.0
+scipy>=1.11.0
+sympy>=1.12
+networkx>=3.1
+tensorflow>=2.15.0
+torch>=2.1.0
+
+# Speech Recognition & TTS
+google-cloud-speech>=2.21.0
+google-cloud-texttospeech>=2.14.0
+SpeechRecognition>=3.10.0
+pyttsx3>=2.90
+pyaudio>=0.2.13
+sounddevice>=0.4.6
+# webrtcvad>=2.0.10  # Optional: Requires Visual C++ Build Tools on Windows
+
+# Vector Database and Retrieval
+faiss-cpu>=1.7.4
+rank-bm25>=0.2.2
+
+# Web and API
+fastapi>=0.104.0
+uvicorn>=0.24.0
+websockets>=12.0
+aiohttp>=3.9.0
+requests>=2.31.0
+httpx>=0.25.0
+beautifulsoup4>=4.12.0
+selenium>=4.15.0
+lxml>=4.9.0
+html5lib>=1.1
+
+# Web Scraping (Enhanced)
+scrapy>=2.11.0
+playwright>=1.40.0
+requests-html>=0.10.0
+
+# Real-time Data APIs
+newsapi-python>=0.2.7
+python-weather>=1.0.0
+duckduckgo-search>=3.9.0
+wikipedia>=1.4.0
+wolframalpha>=5.0.0
+
+# Knowledge Graph
+rdflib>=7.0.0
+SPARQLWrapper>=2.0.0
+
+# OS Control - Windows
+pywin32>=306; sys_platform == 'win32'
+comtypes>=1.2.0; sys_platform == 'win32'
+
+# OS Control - Linux
+dbus-python>=1.3.2; sys_platform == 'linux'
+python-xlib>=0.33; sys_platform == 'linux'
+
+# OS Control - macOS
+pyobjc>=10.0; sys_platform == 'darwin'
+
+# System Monitoring
+psutil>=5.9.0
+pygetwindow>=0.0.9; sys_platform == 'win32'
+
+# Database
+sqlalchemy>=2.0.0
+cryptography>=41.0.0
+
+# Data Processing
+pandas>=2.1.0
+
+# Utilities
+pydantic>=2.5.0
+python-dotenv>=1.0.0
+pyyaml>=6.0.1
+joblib>=1.3.0
+jinja2>=3.1.2
+
+# Rate Limiting
+slowapi>=0.1.9
+
+# Grammar and Language Tools
+language-tool-python>=2.7.1
+
+# Development and Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-benchmark>=4.0.0
+black>=23.11.0
+pylint>=3.0.0
+memory-profiler>=0.61.0
+
+# Enhanced NLP & Understanding (JARVIS Upgrades)
+stanza>=1.5.0
+symspellpy>=6.7.7
+fuzzywuzzy>=0.18.0
+python-Levenshtein>=0.21.0
+
+# Knowledge Graph Enhancement
+py2neo>=2021.2.3
+
+# Additional LangChain Components
+langchain-experimental>=0.0.40

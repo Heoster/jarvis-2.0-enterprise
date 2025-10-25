@@ -1,0 +1,151 @@
+# On-Device Assistant Configuration
+
+# Core settings
+assistant:
+  name: "Jarvis"
+  personality: "sophisticated"  # sophisticated, friendly, formal, concise
+  language: "en"
+  log_level: "INFO"
+
+# Model settings
+models:
+  ai:
+    use_dialogflow: false
+    dialogflow_project_id: null
+    local_model: "facebook/blenderbot-400M-distill"
+    backend_preference: "local"  # 'local' or 'dialogflow'
+  
+  stt:
+    provider: "google"  # 'google' or 'local'
+    google_credentials: null
+    language: "en"
+    device: "cpu"
+  
+  tts:
+    provider: "google"  # 'google' or 'local'
+    google_credentials: null
+    voice: "en-US-Standard-A"
+    speed: 1.0
+    device: "cpu"
+  
+  nlp:
+    spacy_model: "en_core_web_sm"
+  
+  embeddings:
+    model: "all-MiniLM-L6-v2"
+    device: "cpu"
+  
+  vision:
+    enabled: true
+    face_detection: true
+    object_detection: true
+
+# Performance settings
+performance:
+  max_concurrent_actions: 5
+  model_cache_size: 3
+  response_cache_ttl: 3600
+  embedding_batch_size: 32
+  lazy_load_models: true
+  model_idle_timeout: 300
+
+# Privacy settings
+privacy:
+  data_retention_days: 30
+  encrypt_memory: true
+  local_only: true
+  default_permissions:
+    monitor_web: false
+    monitor_apps: false
+    control_device: false
+    control_browser: false
+    access_memory: true
+    call_apis: false
+
+# Server settings
+server:
+  host: "127.0.0.1"
+  port: 8000
+  cors_origins:
+    - "http://localhost:*"
+    - "http://127.0.0.1:*"
+  enable_api_key: false
+  api_key: null
+  rate_limit_per_minute: 60
+
+# Voice settings
+voice:
+  wakeword:
+    enabled: true
+    phrase: "hey assistant"
+    sensitivity: 0.5
+  
+  vad:
+    enabled: true
+    aggressiveness: 2
+    frame_duration_ms: 30
+  
+  audio:
+    sample_rate: 16000
+    channels: 1
+    chunk_size: 1024
+
+# Retrieval settings
+retrieval:
+  top_k_sparse: 20
+  top_k_dense: 10
+  min_confidence: 0.3
+  use_reranking: true
+
+# Database settings
+database:
+  memory_db: "data/memory.db"
+  cache_db: "data/cache.db"
+  vector_index: "data/vectors.index"
+  enable_wal: true
+
+# Logging settings
+logging:
+  level: "INFO"
+  file: "data/logs/assistant.log"
+  max_size_mb: 100
+  retention_days: 7
+  format: "json"
+  redact_sensitive: true
+
+# Activity monitoring
+activity:
+  enabled: false
+  web_tracking: false
+  app_tracking: false
+  blacklist_domains: []
+  whitelist_apps: []
+
+# API integrations
+apis:
+  weather:
+    enabled: true
+    api_key: null
+    provider: "openweathermap"
+  
+  news:
+    enabled: true
+    api_key: null
+    provider: "newsapi"
+  
+  search:
+    enabled: true
+    provider: "duckduckgo"
+  
+  knowledge:
+    enabled: true
+    use_wikipedia: true
+    use_wikidata: false
+
+# Safety settings
+safety:
+  require_confirmation_for_high_risk: true
+  high_risk_cooldown_seconds: 5
+  sandbox_code_execution: true
+  max_code_execution_time: 10
+  command_whitelist: []
