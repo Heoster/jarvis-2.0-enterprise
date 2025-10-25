@@ -306,6 +306,23 @@ class EnhancedIntentClassifier:
         
         return 0.0
     
+    def train(self, texts: List[str], labels: List[str]):
+        """
+        Train classifier with custom data.
+        
+        Args:
+            texts: List of training texts
+            labels: List of corresponding labels
+        """
+        if len(texts) != len(labels):
+            raise ValueError("Number of texts and labels must match")
+        
+        self.pipeline.fit(texts, labels)
+        logger.info(f"Trained enhanced classifier with {len(texts)} examples")
+        
+        # Save updated model
+        self.save_model()
+    
     def save_model(self):
         """Save model to disk."""
         self.model_path.parent.mkdir(parents=True, exist_ok=True)

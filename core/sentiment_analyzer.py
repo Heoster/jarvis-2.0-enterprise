@@ -1,6 +1,6 @@
 """Sentiment Analysis for mood detection and tone adjustment."""
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import re
 
 from core.logger import get_logger
