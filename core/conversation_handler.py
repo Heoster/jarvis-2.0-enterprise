@@ -264,17 +264,6 @@ class ConversationHandler:
         return summary
 
 
-# Singleton instance
-_conversation_handler = None
-
-def get_conversation_handler() -> ConversationHandler:
-    """Get or create conversation handler instance"""
-    global _conversation_handler
-    if _conversation_handler is None:
-        _conversation_handler = ConversationHandler()
-    return _conversation_handler
-
-    
     def add_to_history(self, query: str, response: str, intent: Optional[str] = None):
         """Add exchange to conversation history"""
         exchange = {
@@ -471,3 +460,14 @@ def get_conversation_handler() -> ConversationHandler:
         self.awaiting_clarification = False
         self.clarification_options = []
         logger.info("Conversation history cleared")
+
+
+# Singleton instance
+_conversation_handler_instance = None
+
+def get_conversation_handler() -> ConversationHandler:
+    """Get or create conversation handler instance"""
+    global _conversation_handler_instance
+    if _conversation_handler_instance is None:
+        _conversation_handler_instance = ConversationHandler()
+    return _conversation_handler_instance
