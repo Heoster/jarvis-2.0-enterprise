@@ -53,6 +53,9 @@ class EnhancedIntentClassifier:
         # Initialize CLI/modding patterns
         self.cli_patterns = self._initialize_cli_patterns()
         
+        # Add new intent patterns from architecture analysis
+        self._add_enhanced_patterns()
+        
         logger.info("Enhanced Intent Classifier initialized with spaCy NER and semantic matching")
     
     def _initialize_spacy(self, model_name: str):
@@ -343,3 +346,132 @@ class EnhancedIntentClassifier:
             'slot_types': list(self.slot_patterns.keys()),
             'cli_patterns': list(self.cli_patterns.keys())
         }
+    def _add_enhanced_patterns(self):
+        """Add enhanced patterns from architecture analysis"""
+        # Vision analysis patterns
+        self.slot_patterns['vision'] = [
+            {'pattern': r'\b(analyze|describe|what.*in)\s+(image|picture|photo)\b', 'type': 'vision_request'},
+            {'pattern': r'\b(face|object|text)\s+(detection|recognition)\b', 'type': 'vision_type'},
+        ]
+        
+        # Modding help patterns
+        self.slot_patterns['modding'] = [
+            {'pattern': r'\b(minecraft|forge|mod|bukkit)\b.*\b(help|error|issue)\b', 'type': 'modding_help'},
+            {'pattern': r'\b(1\.\d{1,2}(?:\.\d{1,2})?)\b', 'type': 'mc_version'},
+            {'pattern': r'\b(forge|fabric|bukkit|spigot|paper)\b', 'type': 'mod_loader'},
+        ]
+        
+        # Financial query patterns
+        self.slot_patterns['financial'] = [
+            {'pattern': r'\b(bitcoin|btc|ethereum|eth)\b', 'type': 'crypto_name'},
+            {'pattern': r'\b(inr|usd|eur|gbp)\b', 'type': 'currency'},
+            {'pattern': r'\b(mutual fund|nav|scheme)\b', 'type': 'investment_type'},
+        ]
+        
+        # Railway patterns
+        self.slot_patterns['railway'] = [
+            {'pattern': r'\b(\d{5})\b', 'type': 'train_number'},
+            {'pattern': r'\b(pnr|ticket)\s*:?\s*(\d+)\b', 'type': 'pnr_number'},
+            {'pattern': r'\b(muzaffarnagar|delhi|mumbai|bangalore)\b', 'type': 'station_name'},
+        ]
+        
+        # Enhanced CLI patterns
+        self.cli_patterns.update({
+            'vision_command': re.compile(r'\b(analyze|detect|recognize)\s+(image|photo|picture)\b'),
+            'financial_command': re.compile(r'\b(bitcoin|crypto|currency|mutual fund)\s+(price|rate|nav)\b'),
+            'railway_command': re.compile(r'\b(train|pnr|railway)\s+(status|schedule|info)\b'),
+        })
+    
+    def _train_enhanced_data(self):
+        """Add enhanced training data from architecture analysis"""
+        enhanced_training_data = [
+            # Vision analysis
+            ("analyze this image", "vision"),
+            ("what's in this picture", "vision"),
+            ("describe this photo", "vision"),
+            ("detect faces in image", "vision"),
+            ("recognize objects in picture", "vision"),
+            
+            # Modding help
+            ("minecraft forge mod not loading", "code"),
+            ("how to create custom block in forge", "code"),
+            ("bukkit plugin error help", "code"),
+            ("fabric mod development guide", "code"),
+            ("minecraft 1.19 modding tutorial", "code"),
+            
+            # Financial queries
+            ("bitcoin price in inr", "fetch"),
+            ("exchange rate usd to inr", "fetch"),
+            ("crypto prices india", "fetch"),
+            ("mutual fund nav check", "fetch"),
+            ("sbi bluechip fund performance", "fetch"),
+            
+            # Railway queries
+            ("train schedule from muzaffarnagar", "fetch"),
+            ("check pnr status", "fetch"),
+            ("irctc train timing", "fetch"),
+            ("railway reservation status", "fetch"),
+            ("train number 12345 schedule", "fetch"),
+            
+            # Grammar and utility
+            ("check my grammar", "command"),
+            ("correct this sentence", "command"),
+            ("fix spelling errors", "command"),
+            ("grammar check please", "command"),
+            
+            # Quiz and learning
+            ("quiz me on python", "command"),
+            ("test my knowledge", "command"),
+            ("create quiz about java", "command"),
+            ("start learning session", "command"),
+        ]
+        
+        return enhanced_training_data
+    
+    def _create_enhanced_model(self):
+        """Create enhanced ML model with better features"""
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.pipeline import Pipeline
+        
+        self.pipeline = Pipeline([
+            ('tfidf', TfidfVectorizer(
+                max_features=3000,  # Increased features
+                ngram_range=(1, 4),  # Include 4-grams
+                stop_words='english',
+                min_df=1,
+                max_df=0.95,
+                analyzer='word',
+                lowercase=True,
+                token_pattern=r'\b\w+\b'
+            )),
+            ('classifier', RandomForestClassifier(
+                n_estimators=100,
+                max_depth=20,
+                min_samples_split=5,
+                min_samples_leaf=2,
+                random_state=42,
+                class_weight='balanced'
+            ))
+        ])
+        
+        logger.info("Created enhanced ML pipeline with RandomForest")
+    
+    def get_enhanced_model_info(self) -> Dict[str, Any]:
+        """Get enhanced model information"""
+        base_info = self.get_model_info()
+        
+        enhanced_info = {
+            **base_info,
+            'enhanced_features': {
+                'vision_patterns': len(self.slot_patterns.get('vision', [])),
+                'modding_patterns': len(self.slot_patterns.get('modding', [])),
+                'financial_patterns': len(self.slot_patterns.get('financial', [])),
+                'railway_patterns': len(self.slot_patterns.get('railway', [])),
+                'total_cli_patterns': len(self.cli_patterns),
+            },
+            'model_type': 'enhanced_classifier',
+            'version': '2.0'
+        }
+        
+        return enhanced_info

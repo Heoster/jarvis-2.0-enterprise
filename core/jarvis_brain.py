@@ -1,8 +1,14 @@
-"""Jarvis Brain - Advanced response generation using Transformers + LangChain."""
+"""
+JARVIS Brain - Complete Iron Man AI Assistant
+Advanced response generation with Iron Man personality, automatic learning, and comprehensive NLP
+"""
 
 import asyncio
+import time
+import re
 from typing import Dict, Any, Optional, List
-from datetime import datetime
+from datetime import datetime, timezone
+from collections import deque
 
 from core.logger import get_logger
 from core.api_router import get_api_router, APIEndpoint
@@ -10,14 +16,38 @@ from core.heoster_personality import get_heoster_jarvis
 from core.web_scraper import get_web_scraper
 from core.indian_apis import get_indian_api
 from core.conversation_handler import get_conversation_handler
+from core.intent_router import get_intent_router
+from core.intent_classifier_enhanced import EnhancedIntentClassifier
+from core.constants import ConfidenceThresholds, ResponseLimits, PersonalitySettings
+from core.formatters import FormatterFactory
+from core.cache_manager import get_cache_manager
+from monitoring.metrics import get_metrics_collector
+from core.nlp import NLPEngine
+from execution.math_engine import MathEngine
+from core.vision import VisionEngine
+from core.models import Intent, IntentCategory
 
 logger = get_logger(__name__)
 
 
 class JarvisBrain:
     """
-    Jarvis's intelligent brain combining Transformers and LangChain.
-    Generates sophisticated, context-aware responses.
+    JARVIS Complete AI Brain - Iron Man Assistant
+    
+    Features:
+    🤖 Iron Man Personality & Responses
+    🧠 Advanced NLP with spaCy and Transformers
+    ⏰ Real-time Time/Date Awareness
+    💬 Smart Conversational Editing
+    🎓 Automatic Learning from Feedback
+    🔍 Advanced Web Search & Scraping
+    💰 Real-time Financial Data (Bitcoin, Currency, Mutual Funds)
+    🚂 Indian Railway Information
+    🎭 Entertainment Content (Jokes, Quotes, Images)
+    📚 Smart Knowledge Integration
+    🎯 Proactive Assistance
+    🔧 Enhanced Error Handling
+    📊 Comprehensive Monitoring
     """
     
     def __init__(
@@ -50,6 +80,37 @@ class JarvisBrain:
         # Initialize Heoster's personal Jarvis personality
         self.heoster_personality = get_heoster_jarvis()
         
+        # Initialize intent router for centralized routing
+        self.intent_router = get_intent_router()
+        
+        # Initialize enhanced intent classifier
+        self.intent_classifier = EnhancedIntentClassifier()
+        
+        # Initialize formatter factory
+        self.formatter_factory = FormatterFactory()
+        
+        # Initialize enhanced components
+        self.cache_manager = get_cache_manager()
+        self.metrics = get_metrics_collector()
+        self.nlp_engine = NLPEngine()
+        self.math_engine = MathEngine()
+        self.vision_engine = VisionEngine()
+        
+        # Iron Man personality settings
+        self.personality_mode = "iron_man"
+        self.user_name = "heoster"
+        self.location = "muzaffarnagar, India"
+        
+        # Learning and training
+        self.learning_enabled = True
+        self.positive_feedback_count = 0
+        self.learning_threshold = 3
+        self.training_data = deque(maxlen=100)
+        
+        # Conversational memory
+        self.conversation_memory = deque(maxlen=10)
+        self.context_awareness = True
+        
         # Track active quiz state
         self.active_quiz_id = None
         self.last_query = None
@@ -66,9 +127,13 @@ class JarvisBrain:
         
         self._initialize_components()
         
-        logger.info("Jarvis Brain initialized with Natural Language Understanding + Transformers + LangChain + APIs")
-        logger.info(f"Personal AI for {self.heoster_personality.owner}, developed by {self.heoster_personality.company}")
-        logger.info("Enhanced conversational abilities and Indian-specific features enabled")
+        logger.info("Enhanced Jarvis Brain initialized with new architecture")
+        logger.info("✅ Intent Router: Centralized routing system")
+        logger.info("✅ Enhanced Classifier: Multi-stage intent detection") 
+        logger.info("✅ Formatter Factory: Standardized response formatting")
+        logger.info("✅ Tool System: Modular capability framework")
+        logger.info("Personal AI for Heoster, developed by Codeex AI Company")
+        logger.info("Jarvis 2.0 is ready to assist with enhanced capabilities")
     
     def _initialize_components(self):
         """Initialize Transformers and LangChain components."""
@@ -173,8 +238,7 @@ class JarvisBrain:
 
 Current conversation:
 {chat_history}
-Hu
-man: {input}
+Human: {input}
 Jarvis: """
             
             prompt = PromptTemplate(
@@ -203,828 +267,463 @@ Jarvis: """
         context: Optional[Dict[str, Any]] = None
     ) -> str:
         """
-        Generate intelligent response using Transformers + LangChain + API Routing + Web Scraping.
+        Generate intelligent Iron Man JARVIS response with all enhanced features.
         
         Args:
             query: User query
-            context: Additional context (real-time data, execution results, etc.)
+            context: Additional context
             
         Returns:
-            Jarvis's response
+            Complete JARVIS response with Iron Man personality
         """
+        start_time = time.time()
+        
         try:
-            # Initialize web scraper if needed
-            if self.web_scraper is None:
-                self.web_scraper = await get_web_scraper()
+            # Initialize async components
+            await self._initialize_async_components()
             
-            # Initialize Indian API if needed
-            if self.indian_api is None:
-                self.indian_api = await get_indian_api()
+            # Record metrics
+            self.metrics.record_query(query)
             
-            # Initialize context if not provided
-            if context is None:
-                context = {}
+            # Step 1: Smart Query Preprocessing
+            processed_query = await self._smart_preprocess_query(query)
             
-            # First, check if we're awaiting clarification
-            if self.conversation_handler.awaiting_clarification:
-                clarification_response = self.conversation_handler.handle_clarification_response(query)
-                if clarification_response:
-                    # If it's a selection, continue processing
-                    if "Let me help you with that" in clarification_response:
-                        logger.info("User provided clarification, continuing...")
-                        # Add to history and continue
-                        self.conversation_handler.add_to_history(query, clarification_response)
-                    else:
-                        # Return clarification response
-                        self.conversation_handler.add_to_history(query, clarification_response)
-                        return clarification_response
+            # Step 2: Check for immediate responses (time, greetings, etc.)
+            immediate_response = await self._check_immediate_responses(processed_query)
+            if immediate_response:
+                return await self._apply_iron_man_personality(immediate_response, processed_query)
             
-            # Try to understand the query using conversation handler
-            understanding = self.conversation_handler.understand_query(query)
-            logger.info(f"Query understanding: intent={understanding.get('intent')}, type={understanding.get('query_type')}, confidence={understanding.get('confidence')}")
+            # Step 3: Enhanced NLP Analysis
+            nlp_analysis = await self._enhanced_nlp_analysis(processed_query)
             
-            # Check if clarification is needed
-            if self.conversation_handler.should_ask_clarification(query, understanding):
-                is_ambiguous, options = self.conversation_handler.detect_ambiguity(query, understanding)
+            # Step 4: Build comprehensive context
+            enriched_context = await self._build_comprehensive_context(processed_query, context, nlp_analysis)
+            
+            # Step 5: Intent classification with enhanced features
+            intent = await self._classify_intent_enhanced(processed_query, enriched_context)
+            
+            # Step 6: Route to appropriate handler
+            response = await self._route_and_process(processed_query, intent, enriched_context)
+            
+            # Step 7: Apply Iron Man personality and enhancements
+            final_response = await self._apply_iron_man_personality(response, processed_query)
+            
+            # Step 8: Update memory and learning
+            await self._update_memory_and_learning(processed_query, final_response)
+            
+            # Step 9: Record metrics
+            execution_time = time.time() - start_time
+            self.metrics.record_response_time(execution_time, len(final_response))
+            
+            return final_response
+            
+        except Exception as e:
+            logger.error(f"JARVIS response generation failed: {e}")
+            return await self._generate_iron_man_error_response(str(e))
+    
+    async def _initialize_async_components(self):
+        """Initialize async components if needed"""
+        if self.web_scraper is None:
+            self.web_scraper = await get_web_scraper()
+        
+        if self.indian_api is None:
+            self.indian_api = await get_indian_api()
+    
+    async def _smart_preprocess_query(self, query: str) -> str:
+        """
+        Smart preprocessing with conversational editing and typo fixes
+        """
+        # Handle JARVIS wake words
+        if query.lower().startswith(('jarvis', 'hey jarvis', 'ok jarvis')):
+            query = query.split(' ', 1)[1] if ' ' in query else "Yes, sir?"
+        
+        # Fix common greeting variations
+        greeting_fixes = {
+            'hellow': 'hello',
+            'helo': 'hello', 
+            'hllo': 'hello',
+            'helllo': 'hello',
+            'hi jarvis': 'hello',
+            'hey jarvis': 'hello'
+        }
+        
+        query_lower = query.lower().strip()
+        for wrong, correct in greeting_fixes.items():
+            if query_lower == wrong or query_lower.startswith(wrong + ' '):
+                query = query_lower.replace(wrong, correct, 1)
+                break
+        
+        # Fix common command patterns
+        command_fixes = {
+            'serach': 'search',
+            'seach': 'search',
+            'find me': 'search for',
+            'look for': 'search for',
+            'whats': 'what is',
+            'whos': 'who is',
+            'hows': 'how is'
+        }
+        
+        for wrong, correct in command_fixes.items():
+            if wrong in query.lower():
+                query = re.sub(re.escape(wrong), correct, query, flags=re.IGNORECASE)
+        
+        # Expand contractions
+        contractions = {
+            "won't": "will not", "can't": "cannot", "n't": " not",
+            "'re": " are", "'ve": " have", "'ll": " will", "'d": " would", "'m": " am"
+        }
+        
+        for contraction, expansion in contractions.items():
+            query = query.replace(contraction, expansion)
+        
+        # Clean up spacing
+        query = re.sub(r'\s+', ' ', query).strip()
+        
+        return query
+    
+    async def _check_immediate_responses(self, query: str) -> Optional[str]:
+        """Check for immediate responses (time, date, basic greetings)"""
+        query_lower = query.lower()
+        
+        # Time queries
+        if any(phrase in query_lower for phrase in [
+            'what time is it', 'current time', 'time now', 'what\'s the time',
+            'tell me the time', 'time please'
+        ]):
+            now = datetime.now()
+            time_str = now.strftime("%I:%M %p")
+            date_str = now.strftime("%A, %B %d, %Y")
+            return f"🕐 **Current Time:** {time_str}\n📅 **Date:** {date_str}"
+        
+        # Date queries
+        if any(phrase in query_lower for phrase in [
+            'what date is it', 'today\'s date', 'current date', 'what day is it',
+            'tell me the date', 'date please'
+        ]):
+            now = datetime.now()
+            date_str = now.strftime("%A, %B %d, %Y")
+            day_str = now.strftime("%A")
+            return f"📅 **Today is:** {day_str}\n📆 **Full Date:** {date_str}"
+        
+        return None
+    
+    async def _enhanced_nlp_analysis(self, query: str) -> Dict[str, Any]:
+        """Enhanced NLP analysis using spaCy and custom processing"""
+        try:
+            # Use NLP engine for analysis
+            nlp_result = await self.nlp_engine.analyze(query)
+            
+            # Convert NLPResult to dict and add custom analysis
+            analysis = nlp_result.to_dict() if hasattr(nlp_result, 'to_dict') else {}
+            
+            # Add custom analysis
+            analysis.update({
+                'query_length': len(query),
+                'word_count': len(query.split()),
+                'has_question_mark': '?' in query,
+                'is_greeting': any(word in query.lower() for word in ['hello', 'hi', 'hey', 'good morning']),
+                'is_command': any(word in query.lower() for word in ['search', 'find', 'show', 'tell', 'get']),
+                'is_question': any(word in query.lower() for word in ['what', 'how', 'why', 'when', 'where', 'who']),
+                'mentions_time': any(word in query.lower() for word in ['time', 'date', 'when', 'today']),
+                'mentions_jarvis': 'jarvis' in query.lower()
+            })
+            
+            return analysis
+            
+        except Exception as e:
+            logger.error(f"NLP analysis failed: {e}")
+            return {'error': str(e)}
+    
+    async def _build_comprehensive_context(self, query: str, base_context: Optional[Dict], nlp_analysis: Dict) -> Dict[str, Any]:
+        """Build comprehensive context with all available information"""
+        context = base_context or {}
+        
+        # Add NLP analysis
+        context['nlp_analysis'] = nlp_analysis
+        
+        # Add conversation memory
+        context['conversation_history'] = list(self.conversation_memory)
+        
+        # Add personality settings
+        context.update({
+            'personality_mode': self.personality_mode,
+            'user_name': self.user_name,
+            'location': self.location,
+            'learning_enabled': self.learning_enabled
+        })
+        
+        # Add session info
+        context.update({
+            'active_quiz_id': self.active_quiz_id,
+            'last_query': self.last_query,
+            'last_response': self.last_response,
+            'interaction_count': len(self.conversation_memory)
+        })
+        
+        # Detect specific needs
+        query_lower = query.lower()
+        
+        if any(word in query_lower for word in ['search', 'find', 'look up', 'what is', 'who is']):
+            context['needs_web_search'] = True
+        
+        if any(word in query_lower for word in ['bitcoin', 'currency', 'mutual fund', 'train', 'joke']):
+            context['needs_api_data'] = True
+        
+        if any(word in query_lower for word in ['calculate', 'compute', 'solve', '+', '-', '*', '/']):
+            context['needs_math'] = True
+        
+        return context
+    
+    async def _classify_intent_enhanced(self, query: str, context: Dict[str, Any]) -> Intent:
+        """Enhanced intent classification with context awareness"""
+        try:
+            # Use enhanced intent classifier
+            intent = await self.intent_classifier.classify(query, context)
+            
+            # Boost confidence based on context
+            if context.get('nlp_analysis', {}).get('is_greeting') and intent.category.value == 'conversational':
+                intent.confidence = min(intent.confidence + 0.2, 1.0)
+            
+            if context.get('needs_web_search') and intent.category.value == 'fetch':
+                intent.confidence = min(intent.confidence + 0.15, 1.0)
+            
+            return intent
+            
+        except Exception as e:
+            logger.error(f"Intent classification failed: {e}")
+            return Intent(
+                category=IntentCategory.QUESTION,
+                confidence=0.5,
+                parameters={},
+                context=context
+            )
+    
+    async def _route_and_process(self, query: str, intent: Intent, context: Dict[str, Any]) -> str:
+        """Route query and process through appropriate handler"""
+        
+        # Check cache first
+        cache_key = f"query_{hash(query)}_{intent.category.value}"
+        cached_response = self.cache_manager.get(cache_key)
+        if cached_response:
+            logger.info("Using cached response")
+            return cached_response
+        
+        # Route based on intent and context
+        if context.get('needs_web_search'):
+            response = await self._handle_web_search(query, context)
+        elif context.get('needs_api_data'):
+            response = await self._handle_api_data(query, context)
+        elif context.get('needs_math'):
+            response = await self._handle_math_query(query, context)
+        elif intent.category.value == 'conversational':
+            response = await self._handle_conversational(query, context)
+        else:
+            # Use intent router for complex routing
+            response = await self.intent_router.route(query, intent, context)
+        
+        # Cache the response
+        self.cache_manager.set(cache_key, response, ttl=1800)  # 30 minutes
+        
+        return response 
+   
+    async def _handle_web_search(self, query: str, context: Dict[str, Any]) -> str:
+        """Handle web search queries"""
+        try:
+            # Extract search query
+            search_query = query
+            for keyword in ['search for', 'find', 'look up', 'what is', 'who is', 'tell me about']:
+                if keyword in query.lower():
+                    search_query = query.lower().split(keyword)[-1].strip()
+                    break
+            
+            # Perform search and scrape
+            web_results = await self.web_scraper.search_and_scrape(search_query, num_results=3)
+            
+            if web_results and not web_results.get('error') and web_results.get('scraped_content'):
+                formatter = self.formatter_factory.get_formatter('web_search')
+                return formatter.format(web_results)
+            else:
+                return f"I searched for '{search_query}' but couldn't find reliable information, sir. Would you like me to try a different approach?"
                 
-                if is_ambiguous:
-                    # Generate suggestions if no specific options
-                    if not options or options == ['Please be more specific about what you need']:
-                        options = self.conversation_handler.generate_suggestions(query)
-                    
-                    clarification_question = self.conversation_handler.generate_clarification_question(query, options)
-                    self.conversation_handler.awaiting_clarification = True
-                    self.conversation_handler.clarification_options = options
-                    
-                    logger.info(f"Asking for clarification with {len(options)} options")
-                    self.conversation_handler.add_to_history(query, clarification_question)
-                    return clarification_question
+        except Exception as e:
+            logger.error(f"Web search failed: {e}")
+            return f"I encountered an issue while searching, sir. {str(e)}"
+    
+    async def _handle_api_data(self, query: str, context: Dict[str, Any]) -> str:
+        """Handle API data queries (financial, railway, entertainment)"""
+        try:
+            query_lower = query.lower()
             
-            # Check for conversational intents (greetings, thanks, etc.)
-            if understanding.get('intent') and understanding.get('confidence', 0) > 0.7:
-                contextual_response = self.conversation_handler.generate_contextual_response(query, understanding)
-                if contextual_response:
-                    logger.info(f"Using conversational response for intent: {understanding.get('intent')}")
-                    self.last_query = query
-                    self.last_response = contextual_response
-                    self._update_memory(query, contextual_response)
-                    self.conversation_handler.add_to_history(query, contextual_response, understanding.get('intent'))
-                    return contextual_response
+            # Financial data
+            if any(keyword in query_lower for keyword in ['bitcoin', 'crypto', 'currency', 'mutual fund']):
+                if 'bitcoin' in query_lower or 'crypto' in query_lower:
+                    financial_data = await self.indian_api.get_financial_summary()
+                    if not financial_data.get('error'):
+                        formatter = self.formatter_factory.get_formatter('financial')
+                        return formatter.format(financial_data)
+                
+                elif 'mutual fund' in query_lower:
+                    mf_data = await self.indian_api.get_mutual_fund_info()
+                    if not mf_data.get('error'):
+                        formatter = self.formatter_factory.get_formatter('financial')
+                        return formatter._format_mutual_funds(mf_data)
             
-            # Check if query requires Indian financial/geographical data
-            indian_finance_keywords = ['bitcoin', 'crypto', 'btc', 'currency', 'exchange rate', 'inr', 'rupee', 'dollar', 'euro']
-            indian_geo_keywords = ['muzaffarnagar', 'pincode', 'pin code', '251201', 'uttar pradesh', 'up', 'my location', 'ip address']
-            railway_keywords = ['train', 'railway', 'pnr', 'irctc', 'train schedule', 'train number']
-            mutual_fund_keywords = ['mutual fund', 'nav', 'sbi bluechip', 'hdfc', 'icici', 'scheme code', 'fund house']
-            entertainment_keywords = ['joke', 'funny', 'dog image', 'cat fact', 'quote', 'inspire me', 'make me laugh']
-            
-            needs_indian_finance = any(keyword in query.lower() for keyword in indian_finance_keywords)
-            needs_indian_geo = any(keyword in query.lower() for keyword in indian_geo_keywords)
-            needs_railway = any(keyword in query.lower() for keyword in railway_keywords)
-            needs_mutual_fund = any(keyword in query.lower() for keyword in mutual_fund_keywords)
-            needs_entertainment = any(keyword in query.lower() for keyword in entertainment_keywords)
-            
-            # Handle Indian Railway queries
-            if needs_railway:
-                logger.info(f"🚂 Query requires Indian Railway data: '{query}'")
+            # Railway data
+            elif any(keyword in query_lower for keyword in ['train', 'railway', 'pnr']):
                 railway_data = await self.indian_api.get_railway_info()
-                
                 if not railway_data.get('error'):
-                    formatted_railway = self._format_indian_railway(railway_data)
-                    self.last_query = query
-                    self.last_response = formatted_railway
-                    self._update_memory(query, formatted_railway)
-                    return formatted_railway
+                    formatter = self.formatter_factory.get_formatter('railway')
+                    return formatter.format(railway_data)
             
-            # Handle Mutual Fund queries
-            if needs_mutual_fund:
-                logger.info(f"📈 Query requires Mutual Fund data: '{query}'")
-                mf_data = await self.indian_api.get_mutual_fund_info()
-                
-                if not mf_data.get('error'):
-                    formatted_mf = self._format_mutual_fund(mf_data)
-                    self.last_query = query
-                    self.last_response = formatted_mf
-                    self._update_memory(query, formatted_mf)
-                    return formatted_mf
-            
-            # Handle Entertainment queries
-            if needs_entertainment:
-                logger.info(f"😄 Query requires Entertainment content: '{query}'")
-                
-                # Determine content type
+            # Entertainment
+            elif any(keyword in query_lower for keyword in ['joke', 'quote', 'dog', 'cat']):
                 content_type = 'joke'
-                if 'programming' in query.lower() or 'code' in query.lower():
-                    content_type = 'programming_joke'
-                elif 'dog' in query.lower():
-                    content_type = 'dog'
-                elif 'cat' in query.lower():
-                    content_type = 'cat'
-                elif 'quote' in query.lower() or 'inspire' in query.lower():
+                if 'quote' in query_lower:
                     content_type = 'quote'
+                elif 'dog' in query_lower:
+                    content_type = 'dog'
+                elif 'cat' in query_lower:
+                    content_type = 'cat'
                 
                 entertainment_data = await self.indian_api.get_entertainment(content_type)
-                
                 if not entertainment_data.get('error'):
-                    formatted_entertainment = self._format_entertainment(entertainment_data, content_type)
-                    self.last_query = query
-                    self.last_response = formatted_entertainment
-                    self._update_memory(query, formatted_entertainment)
-                    return formatted_entertainment
+                    formatter = self.formatter_factory.get_formatter('entertainment')
+                    return formatter.format({'content': entertainment_data, 'type': content_type})
             
-            # Handle Indian financial queries
-            if needs_indian_finance:
-                logger.info(f"💰 Query requires Indian financial data: '{query}'")
-                financial_data = await self.indian_api.get_financial_summary()
-                
-                if not financial_data.get('error'):
-                    formatted_finance = self._format_indian_finance(financial_data)
-                    self.last_query = query
-                    self.last_response = formatted_finance
-                    self._update_memory(query, formatted_finance)
-                    return formatted_finance
-            
-            # Handle Indian geographical queries
-            if needs_indian_geo:
-                logger.info(f"📍 Query requires Indian geographical data: '{query}'")
-                location_data = await self.indian_api.get_location_summary()
-                
-                if not location_data.get('error'):
-                    formatted_location = self._format_indian_location(location_data)
-                    self.last_query = query
-                    self.last_response = formatted_location
-                    self._update_memory(query, formatted_location)
-                    return formatted_location
-            
-            # Check if query requires web search/scraping
-            web_search_keywords = ['search', 'find', 'look up', 'what is', 'who is', 'latest', 'news about', 'information on', 'tell me about']
-            needs_web_search = any(keyword in query.lower() for keyword in web_search_keywords)
-            
-            # If web search is needed, perform it first
-            if needs_web_search and not context.get('skip_web_search'):
-                logger.info(f"🔍 Query requires web search: '{query}'")
-                
-                # Extract search query
-                search_query = query
-                for keyword in ['search for', 'find', 'look up', 'what is', 'who is', 'tell me about', 'information on']:
-                    if keyword in query.lower():
-                        search_query = query.lower().split(keyword)[-1].strip()
-                        logger.info(f"📝 Extracted search query: '{search_query}'")
-                        break
-                
-                # Perform search and scrape
-                logger.info(f"🌐 Performing web search and scrape for: '{search_query}'")
-                web_results = await self.web_scraper.search_and_scrape(search_query, num_results=3)
-                
-                # Log results
-                if web_results:
-                    scraped_count = len(web_results.get('scraped_content', []))
-                    logger.info(f"✅ Web search complete: {scraped_count} pages scraped")
-                
-                # If we got results, format and return them directly
-                if web_results and not web_results.get('error') and web_results.get('scraped_content'):
-                    logger.info("📄 Formatting web search results for display")
-                    formatted_results = self._format_web_search_results(web_results)
-                    
-                    # Store in memory
-                    self.last_query = query
-                    self.last_response = formatted_results
-                    self._update_memory(query, formatted_results)
-                    
-                    logger.info("✅ Returning formatted web search results")
-                    return formatted_results
-                else:
-                    logger.warning(f"⚠️ Web search returned no scraped content")
-                
-                # Add web results to context for fallback
-                context['web_search_results'] = web_results
-                context['web_search_performed'] = True
-            
-            # First, check if this should be routed to a specific API endpoint
-            api_context = {
-                'active_quiz_id': self.active_quiz_id,
-                'last_query': self.last_query,
-                'last_response': self.last_response
-            }
-            
-            api_result = await self.api_router.route_request(query, api_context)
-            
-            if api_result.get('routed'):
-                # API endpoint handled the request
-                response = api_result.get('formatted', 'Request processed.')
-                
-                # Update quiz state if applicable
-                if api_result.get('type') == 'quiz_create':
-                    self.active_quiz_id = api_result.get('quiz_id')
-                elif api_result.get('type') == 'quiz_answer':
-                    if api_result.get('completed'):
-                        self.active_quiz_id = None
-                
-                # Store in memory
-                self.last_query = query
-                self.last_response = response
-                self._update_memory(query, response)
-                
-                return response
-            # Check for simple conversational intents first (greetings, thanks, etc.)
-            # Use fallback for these to ensure consistent, appropriate responses
-            if context and context.get('intent'):
-                intent = context['intent']
-                intent_context = intent.context
-                if 'preprocessed' in intent_context:
-                    preprocessed = intent_context['preprocessed']
-                    detected_intent = preprocessed.get('intent')
-                    
-                    # Use fallback for simple conversational intents
-                    if detected_intent in ['greeting', 'farewell', 'thanks']:
-                        return self._generate_fallback_response(query, context)
-                    
-                    # Use fallback for math queries with execution results
-                    if detected_intent == 'math' and context.get('execution_results'):
-                        return self._generate_fallback_response(query, context)
-                    
-                    # Use fallback for questions and other queries
-                    if detected_intent in ['question', 'weather', 'news', 'search']:
-                        return self._generate_fallback_response(query, context)
-            
-            # Build enhanced prompt with context
-            enhanced_query = self._build_enhanced_prompt(query, context)
-            
-            # Generate response using LangChain if available
-            if self.conversation_chain:
-                response = await asyncio.to_thread(
-                    self.conversation_chain.predict,
-                    input=enhanced_query
-                )
-            else:
-                # Fallback to direct transformer generation
-                response = await self._generate_with_transformer(enhanced_query)
-            
-            # Post-process response
-            response = self._post_process_response(response, context)
-            
-            # Store in memory
-            self.last_query = query
-            self.last_response = response
-            self._update_memory(query, response)
-            
-            return response
+            return "I couldn't retrieve that information right now, sir. Please try again later."
             
         except Exception as e:
-            logger.error(f"Jarvis response generation failed: {e}")
-            return self._generate_fallback_response(query, context)
+            logger.error(f"API data handling failed: {e}")
+            return f"I encountered an issue accessing that data, sir. {str(e)}"
     
-    def _build_enhanced_prompt(
-        self,
-        query: str,
-        context: Optional[Dict[str, Any]] = None
-    ) -> str:
-        """Build enhanced prompt with context including web search results."""
-        # Use Heoster's personal Jarvis system prompt
-        prompt_parts = [
-            self.heoster_personality.create_system_prompt(),
-            f"\nHeoster's Query: {query}"
-        ]
-        
-        if not context:
-            return "\n".join(prompt_parts)
-        
-        # Add web search results if available
-        if context.get('web_search_results'):
-            web_results = context['web_search_results']
-            if not web_results.get('error') and web_results.get('scraped_content'):
-                prompt_parts.append("\nWeb Search Results:")
-                for i, item in enumerate(web_results['scraped_content'][:3], 1):
-                    prompt_parts.append(f"\n{i}. {item['title']}")
-                    prompt_parts.append(f"   URL: {item['url']}")
-                    prompt_parts.append(f"   Content: {item['content'][:500]}...")
-                prompt_parts.append("\nUse this information to provide an accurate, comprehensive response to Heoster.")
-        
-        # Add real-time data context with rich information
-        if context.get('realtime_data'):
-            realtime = context['realtime_data']
-            
-            if 'weather' in realtime and not realtime['weather'].get('error'):
-                weather = realtime['weather']
-                prompt_parts.append(
-                    f"\nWeather Information: The current temperature in {weather.get('location', 'the area')} "
-                    f"is {weather.get('temperature', 'N/A')}°C with {weather.get('description', 'unknown conditions')}. "
-                    f"Humidity is {weather.get('humidity', 'N/A')}%."
-                )
-            
-            if 'news' in realtime and realtime['news']:
-                news_items = [n for n in realtime['news'] if not n.get('error')]
-                if news_items:
-                    prompt_parts.append(f"\nLatest News Headlines:")
-                    for i, article in enumerate(news_items[:3], 1):
-                        prompt_parts.append(f"{i}. {article.get('title', 'N/A')} - {article.get('source', 'Unknown')}")
-            
-            if 'search' in realtime and realtime['search']:
-                search_results = [s for s in realtime['search'] if not s.get('error')]
-                if search_results:
-                    prompt_parts.append(f"\nWeb Search Results:")
-                    for i, result in enumerate(search_results[:3], 1):
-                        prompt_parts.append(f"{i}. {result.get('title', 'N/A')}: {result.get('snippet', 'N/A')[:100]}")
-            
-            if 'knowledge' in realtime and not realtime['knowledge'].get('error'):
-                knowledge = realtime['knowledge']
-                prompt_parts.append(
-                    f"\nKnowledge Base: {knowledge.get('title', 'Information')}\n"
-                    f"{knowledge.get('summary', 'No summary available')[:300]}"
-                )
-        
-        # Add execution results with context
-        if context.get('execution_results'):
-            results = context['execution_results']
-            if results.get('success'):
-                prompt_parts.append(f"\nComputation Result: {results.get('result', 'Success')}")
-        
-        prompt_parts.append("\nProvide a clear, helpful response based on the above information:")
-        
-        return "\n".join(prompt_parts)
-    
-    async def _generate_with_transformer(self, prompt: str) -> str:
-        """Generate response using transformer model directly."""
-        if not self.model or not self.tokenizer:
-            return "I apologize, but my systems are not fully operational."
-        
+    async def _handle_math_query(self, query: str, context: Dict[str, Any]) -> str:
+        """Handle mathematical queries"""
         try:
-            inputs = self.tokenizer(
-                prompt,
-                return_tensors="pt",
-                max_length=512,
-                truncation=True
-            )
+            # Extract mathematical expression
+            expression = query
+            for keyword in ['calculate', 'compute', 'solve', 'what is']:
+                if keyword in query.lower():
+                    expression = query.lower().split(keyword)[-1].strip()
+                    break
             
-            outputs = await asyncio.to_thread(
-                self.model.generate,
-                **inputs,
-                max_length=self.max_length,
-                num_beams=5,
-                temperature=self.temperature,
-                do_sample=True,
-                top_p=0.9,
-                early_stopping=True
-            )
+            # Evaluate expression
+            result = await self.math_engine.evaluate(expression)
             
-            response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-            return response
-            
+            if result.get('success'):
+                return f"The calculation yields: **{result['result']}**, sir."
+            else:
+                return f"I couldn't solve that mathematical expression, sir. {result.get('error', 'Unknown error')}"
+                
         except Exception as e:
-            logger.error(f"Transformer generation failed: {e}")
-            return "I encountered a processing error. Please try again."
+            logger.error(f"Math query handling failed: {e}")
+            return f"I encountered an issue with that calculation, sir. {str(e)}"
     
-    def _post_process_response(
-        self,
-        response: str,
-        context: Optional[Dict[str, Any]] = None
-    ) -> str:
-        """Post-process and enhance response."""
-        # Remove any prompt artifacts
-        response = response.strip()
+    async def _handle_conversational(self, query: str, context: Dict[str, Any]) -> str:
+        """Handle conversational queries"""
+        query_lower = query.lower()
         
-        # Add Jarvis personality touches
-        if context and context.get('confidence', 1.0) < 0.5:
-            response = f"I believe {response.lower()}"
+        # Greetings
+        if any(word in query_lower for word in ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening']):
+            now = datetime.now()
+            hour = now.hour
+            
+            if 5 <= hour < 12:
+                return "Good morning, Mr. Stark. All systems are operational and ready for your commands."
+            elif 12 <= hour < 17:
+                return "Good afternoon, Mr. Stark. How may I be of service?"
+            elif 17 <= hour < 21:
+                return "Good evening, Mr. Stark. How was your day?"
+            else:
+                return "Working late again, Mr. Stark? I'm here to assist."
+        
+        # Capability questions
+        elif any(phrase in query_lower for phrase in ['what can you do', 'how can you help', 'what are your capabilities']):
+            return """I can assist you with a wide range of tasks, sir:
+
+🔍 **Web Search & Information Retrieval**
+💰 **Financial Data** (Bitcoin prices, currency rates, mutual funds)
+🚂 **Indian Railway Information** 
+🎭 **Entertainment** (jokes, quotes, images)
+⏰ **Time & Date Information**
+🧮 **Mathematical Calculations**
+💬 **Natural Conversations**
+🎯 **Proactive Assistance**
+
+How may I assist you today, Mr. Stark?"""
+        
+        # Identity questions
+        elif any(phrase in query_lower for phrase in ['who are you', 'what are you']):
+            return "I am JARVIS - Just A Rather Very Intelligent System. Your personal AI assistant, Mr. Stark. I'm here to help you with information, calculations, research, and whatever else you might need."
+        
+        # Status questions
+        elif any(phrase in query_lower for phrase in ['how are you', 'status', 'are you okay']):
+            return "All systems operational and running at optimal efficiency, sir. Ready to assist with whatever you need."
+        
+        # Thanks
+        elif any(word in query_lower for word in ['thank', 'thanks']):
+            return "You're most welcome, sir. Always happy to assist."
+        
+        # Default conversational response
+        else:
+            return "I'm here to help, Mr. Stark. What can I do for you?"
+    
+    async def _apply_iron_man_personality(self, response: str, query: str) -> str:
+        """Apply Iron Man JARVIS personality to response"""
+        # Add sir/Mr. Stark if not present
+        if 'sir' not in response.lower() and 'mr. stark' not in response.lower():
+            # Add sir to the end if it's a short response
+            if len(response.split()) < 10:
+                response = response.rstrip('.') + ', sir.'
         
         # Ensure proper capitalization
         if response and not response[0].isupper():
             response = response[0].upper() + response[1:]
         
-        # Add period if missing
-        if response and response[-1] not in '.!?':
-            response += '.'
-        
         return response
     
-    def _generate_fallback_response(
-        self,
-        query: str,
-        context: Optional[Dict[str, Any]] = None
-    ) -> str:
-        """Generate intelligent fallback response when main generation fails."""
-        # First try conversation handler
-        understanding = self.conversation_handler.understand_query(query)
-        if understanding.get('intent'):
-            contextual_response = self.conversation_handler.generate_contextual_response(query, understanding)
-            if contextual_response:
-                return contextual_response
-        
-        query_lower = query.lower().strip()
-        
-        # Check if we have preprocessed/normalized text in context
-        if context and context.get('intent'):
-            intent_context = context['intent'].context
-            if 'preprocessed' in intent_context:
-                preprocessed = intent_context['preprocessed']
-                # Use normalized text for better matching
-                query_lower = preprocessed.get('normalized', query_lower).lower()
-                
-                # Use detected intent for direct responses
-                detected_intent = preprocessed.get('intent')
-                if detected_intent == 'greeting':
-                    from datetime import datetime
-                    hour = datetime.now().hour
-                    if hour < 12:
-                        return "Good morning, sir. Jarvis at your service. How may I assist you today?"
-                    elif hour < 18:
-                        return "Good afternoon, sir. Jarvis at your service. How may I assist you today?"
-                    else:
-                        return "Good evening, sir. Jarvis at your service. How may I assist you today?"
-                elif detected_intent == 'farewell':
-                    return "Until next time, sir. Don't hesitate to call if you need assistance."
-                elif detected_intent == 'thanks':
-                    return "You're most welcome, sir. I'm here whenever you need assistance."
-        
-        # Handle very short or unclear inputs
-        if len(query_lower) <= 2:
-            return "I didn't quite catch that, sir. Could you please be more specific?"
-        
-        # Greeting responses (with fuzzy matching)
-        greeting_patterns = ['hello', 'hi', 'hey', 'greetings', 'hlo', 'hii', 'hy']
-        if any(pattern in query_lower for pattern in greeting_patterns):
-            from datetime import datetime
-            hour = datetime.now().hour
-            if hour < 12:
-                return "Good morning, sir. Jarvis at your service. How may I assist you today?"
-            elif hour < 18:
-                return "Good afternoon, sir. Jarvis at your service. How may I assist you today?"
-            else:
-                return "Good evening, sir. Jarvis at your service. How may I assist you today?"
-        
-        # Math queries
-        if any(word in query_lower for word in ['calculate', 'what is', '+', '-', '*', '/', 'solve']):
-            if context and context.get('execution_results'):
-                result = context['execution_results'].get('result')
-                if result:
-                    return f"The calculation yields {result}."
-            return "I can help you with mathematical calculations. Please provide the expression you'd like me to compute."
-        
-        # Weather queries
-        if 'weather' in query_lower:
-            if context and context.get('realtime_data', {}).get('weather'):
-                weather = context['realtime_data']['weather']
-                if not weather.get('error'):
-                    return (
-                        f"The current weather in {weather.get('location', 'your area')} shows "
-                        f"{weather.get('temperature', 'N/A')}°C with {weather.get('description', 'unknown conditions')}. "
-                        f"Humidity is at {weather.get('humidity', 'N/A')}%."
-                    )
-            return "I can provide weather information. Please specify a location, or configure your weather API key."
-        
-        # News queries
-        if 'news' in query_lower:
-            if context and context.get('realtime_data', {}).get('news'):
-                news = context['realtime_data']['news']
-                if news and not news[0].get('error'):
-                    headlines = "\n".join([f"- {article.get('title', 'N/A')}" for article in news[:3]])
-                    return f"Here are the latest headlines:\n{headlines}"
-            return "I can fetch the latest news for you. Please configure your news API key for this feature."
-        
-        # Search queries
-        if any(word in query_lower for word in ['search', 'find', 'look up']):
-            if context and context.get('realtime_data', {}).get('search'):
-                results = context['realtime_data']['search']
-                if results and not results[0].get('error'):
-                    return f"I found {len(results)} relevant results. The top result is: {results[0].get('title', 'N/A')}"
-            return "I can search the web for information. What would you like me to find?"
-        
-        # Knowledge queries
-        if any(word in query_lower for word in ['who is', 'what is', 'tell me about', 'explain']):
-            if context and context.get('realtime_data', {}).get('knowledge'):
-                knowledge = context['realtime_data']['knowledge']
-                if not knowledge.get('error'):
-                    return f"{knowledge.get('title', 'Information')}: {knowledge.get('summary', 'No information available')[:200]}..."
-            return "I can provide information on various topics. What would you like to know about?"
-        
-        # Thank you responses
-        if any(word in query_lower for word in ['thank', 'thanks']):
-            return "You're welcome, sir. I'm here whenever you need assistance."
-        
-        # Goodbye responses
-        if any(word in query_lower for word in ['bye', 'goodbye', 'see you']):
-            return "Until next time, sir. Don't hesitate to call if you need assistance."
-        
-        # Default intelligent fallback
-        return "I'm here to assist you with calculations, information lookup, web searches, and various other tasks. How may I help you today?"
-    
-    def _format_web_search_results(self, web_results: Dict[str, Any]) -> str:
-        """
-        Format web search results for display to Heoster
-        
-        Args:
-            web_results: Dictionary with search and scraped results
-        
-        Returns:
-            Formatted string with search results
-        """
-        query = web_results.get('query', '')
-        scraped_content = web_results.get('scraped_content', [])
-        search_results = web_results.get('search_results', [])
-        
-        if not scraped_content and not search_results:
-            return self.heoster_personality.format_response(
-                f"I searched for '{query}' but couldn't retrieve any results, sir.",
-                'error'
-            )
-        
-        # Build comprehensive response with clear formatting
-        response = f"\n{'='*80}\n"
-        response += f"🔍 SEARCH RESULTS FOR: '{query}'\n"
-        response += f"{'='*80}\n\n"
-        
-        # If we have scraped content, show it with full details
-        if scraped_content:
-            response += f"✅ Successfully scraped {len(scraped_content)} pages with detailed content:\n\n"
-            
-            for i, item in enumerate(scraped_content, 1):
-                response += f"\n{'─'*80}\n"
-                response += f"📄 RESULT #{i}\n"
-                response += f"{'─'*80}\n\n"
-                
-                # Title (bold and prominent)
-                title = item.get('title', 'No title')
-                response += f"TITLE: {title}\n\n"
-                
-                # Extract domain name from URL
-                url = item.get('url', 'N/A')
-                try:
-                    from urllib.parse import urlparse
-                    parsed = urlparse(url)
-                    domain = parsed.netloc or parsed.path
-                    # Remove 'www.' prefix if present
-                    if domain.startswith('www.'):
-                        domain = domain[4:]
-                    website_name = domain if domain else 'Unknown'
-                except:
-                    website_name = 'Unknown'
-                
-                response += f"🌐 SOURCE: {website_name}\n\n"
-                
-                # Search snippet
-                if item.get('snippet'):
-                    snippet = item['snippet']
-                    response += f"📝 SEARCH SUMMARY:\n{snippet}\n\n"
-                
-                # Meta description if available
-                if item.get('description') and item['description'] != item.get('snippet'):
-                    response += f"📋 PAGE DESCRIPTION:\n{item['description']}\n\n"
-                
-                # Main scraped content with headings preserved
-                if item.get('content'):
-                    content = item['content'].strip()
-                    
-                    # Show substantial content (up to 1500 chars for better visibility)
-                    display_content = content[:1500]
-                    if len(content) > 1500:
-                        display_content += "..."
-                    
-                    response += f"📖 SCRAPED CONTENT:\n"
-                    response += f"{'-'*80}\n"
-                    response += f"{display_content}\n"
-                    response += f"{'-'*80}\n"
-                    response += f"(Showing {len(display_content)} of {len(content)} characters)\n\n"
-                
-                # Show we have more content available
-                if item.get('full_content'):
-                    full_len = len(item['full_content'])
-                    response += f"💾 Full content available: {full_len} characters total\n"
-        
-        # If we only have search results without scraped content
-        elif search_results:
-            response += f"📋 Found {len(search_results)} search results:\n\n"
-            
-            for i, item in enumerate(search_results[:5], 1):
-                response += f"\n{i}. {item.get('title', 'No title')}\n"
-                
-                # Extract domain name from URL
-                url = item.get('url', 'N/A')
-                try:
-                    from urllib.parse import urlparse
-                    parsed = urlparse(url)
-                    domain = parsed.netloc or parsed.path
-                    if domain.startswith('www.'):
-                        domain = domain[4:]
-                    website_name = domain if domain else 'Unknown'
-                except:
-                    website_name = 'Unknown'
-                
-                response += f"   🌐 {website_name}\n"
-                if item.get('snippet'):
-                    response += f"   📝 {item['snippet'][:200]}\n"
-                response += "\n"
-        
-        # Summary footer
-        response += f"\n{'='*80}\n"
-        response += f"✅ SEARCH COMPLETE\n"
-        response += f"{'='*80}\n\n"
-        
-        if scraped_content:
-            response += f"I've retrieved and analyzed {len(scraped_content)} web pages for you, sir.\n"
-            response += "The content above includes the actual text scraped from each page.\n\n"
-        
-        response += "Would you like me to:\n"
-        response += "• Search for more specific information?\n"
-        response += "• Explore any of these sources in more detail?\n"
-        response += "• Summarize the key points from these results?\n"
-        
-        return response
-    
-    def _format_indian_finance(self, financial_data: Dict[str, Any]) -> str:
-        """Format Indian financial data for display"""
-        response = f"\n{'='*80}\n"
-        response += f"💰 INDIAN FINANCIAL DATA (INR)\n"
-        response += f"{'='*80}\n\n"
-        
-        # Cryptocurrency
-        if 'cryptocurrency' in financial_data and not financial_data['cryptocurrency'].get('error'):
-            crypto = financial_data['cryptocurrency']
-            response += f"📊 CRYPTOCURRENCY PRICES\n"
-            response += f"{'-'*80}\n"
-            response += f"Bitcoin (BTC):\n"
-            response += f"  • Price in INR: ₹{crypto.get('price_inr', 'N/A'):,.2f}\n"
-            response += f"  • Price in USD: ${crypto.get('price_usd', 'N/A'):,.2f}\n"
-            response += f"  • Last Updated: {crypto.get('updated', 'N/A')}\n\n"
-        
-        # Currency Rates
-        if 'currency_rates' in financial_data and not financial_data['currency_rates'].get('error'):
-            rates = financial_data['currency_rates']
-            response += f"💱 CURRENCY EXCHANGE RATES (Base: INR)\n"
-            response += f"{'-'*80}\n"
-            for currency, rate in rates.get('rates', {}).items():
-                response += f"  • 1 INR = {rate} {currency}\n"
-            response += f"  • Updated: {rates.get('updated', 'N/A')}\n\n"
-        
-        response += f"{'='*80}\n"
-        response += f"✅ Financial data for India\n"
-        response += f"{'='*80}\n"
-        
-        return response
-    
-    def _format_indian_location(self, location_data: Dict[str, Any]) -> str:
-        """Format Indian geographical data for display"""
-        response = f"\n{'='*80}\n"
-        response += f"📍 INDIAN GEOGRAPHICAL DATA\n"
-        response += f"{'='*80}\n\n"
-        
-        # Pincode Info
-        if 'pincode_info' in location_data and not location_data['pincode_info'].get('error'):
-            pincode = location_data['pincode_info']
-            response += f"📮 PINCODE INFORMATION\n"
-            response += f"{'-'*80}\n"
-            response += f"PIN Code: {pincode.get('pincode', 'N/A')}\n"
-            response += f"Place: {pincode.get('place_name', 'N/A')}\n"
-            response += f"State: {pincode.get('state', 'N/A')}\n"
-            response += f"Coordinates: {pincode.get('latitude', 'N/A')}, {pincode.get('longitude', 'N/A')}\n"
-            response += f"Country: {pincode.get('country', 'N/A')}\n\n"
-        
-        # IP Location
-        if 'your_location' in location_data and not location_data['your_location'].get('error'):
-            ip_loc = location_data['your_location']
-            response += f"🌐 YOUR CURRENT LOCATION (Based on IP)\n"
-            response += f"{'-'*80}\n"
-            response += f"IP Address: {ip_loc.get('ip', 'N/A')}\n"
-            response += f"City: {ip_loc.get('city', 'N/A')}\n"
-            response += f"Region: {ip_loc.get('region', 'N/A')}\n"
-            response += f"Country: {ip_loc.get('country', 'N/A')}\n"
-            response += f"Postal Code: {ip_loc.get('postal', 'N/A')}\n"
-            response += f"Currency: {ip_loc.get('currency', 'N/A')}\n\n"
-        
-        response += f"{'='*80}\n"
-        response += f"✅ Default Location: {location_data.get('default_location', 'Muzaffarnagar, UP, India')}\n"
-        response += f"{'='*80}\n"
-        
-        return response
-    
-    def _format_indian_railway(self, railway_data: Dict[str, Any]) -> str:
-        """Format Indian Railway data for display"""
-        response = f"\n{'='*80}\n"
-        response += f"🚂 INDIAN RAILWAY INFORMATION\n"
-        response += f"{'='*80}\n\n"
-        
-        if 'train_number' in railway_data:
-            response += f"🚆 TRAIN DETAILS\n"
-            response += f"{'-'*80}\n"
-            response += f"Train Number: {railway_data.get('train_number', 'N/A')}\n"
-            response += f"Train Name: {railway_data.get('train_name', 'N/A')}\n"
-            response += f"Route: {railway_data.get('route', 'N/A')}\n"
-            response += f"Departure: {railway_data.get('departure_time', 'N/A')}\n"
-            response += f"Arrival: {railway_data.get('arrival_time', 'N/A')}\n"
-            response += f"Running Days: {railway_data.get('running_days', 'N/A')}\n\n"
-        
-        if 'popular_trains_from_muzaffarnagar' in railway_data:
-            response += f"🚉 POPULAR TRAINS FROM MUZAFFARNAGAR\n"
-            response += f"{'-'*80}\n"
-            for train in railway_data['popular_trains_from_muzaffarnagar']:
-                response += f"  • Train {train}\n"
-            response += "\n"
-        
-        if 'note' in railway_data:
-            response += f"ℹ️  Note: {railway_data['note']}\n"
-        
-        response += f"{'='*80}\n"
-        response += f"✅ Railway information for Muzaffarnagar, UP\n"
-        response += f"{'='*80}\n"
-        
-        return response
-    
-    def _format_mutual_fund(self, mf_data: Dict[str, Any]) -> str:
-        """Format Mutual Fund data for display"""
-        response = f"\n{'='*80}\n"
-        response += f"📈 INDIAN MUTUAL FUND NAV\n"
-        response += f"{'='*80}\n\n"
-        
-        if 'scheme_name' in mf_data:
-            response += f"💼 FUND DETAILS\n"
-            response += f"{'-'*80}\n"
-            response += f"Scheme Name: {mf_data.get('scheme_name', 'N/A')}\n"
-            response += f"Scheme Code: {mf_data.get('scheme_code', 'N/A')}\n"
-            response += f"Fund House: {mf_data.get('fund_house', 'N/A')}\n"
-            response += f"Scheme Type: {mf_data.get('scheme_type', 'N/A')}\n"
-            response += f"NAV: ₹{mf_data.get('nav', 'N/A')}\n"
-            response += f"Date: {mf_data.get('date', 'N/A')}\n"
-            response += f"Currency: {mf_data.get('currency', 'INR')}\n\n"
-        
-        if 'matches' in mf_data:
-            response += f"🔍 SEARCH RESULTS\n"
-            response += f"{'-'*80}\n"
-            for match in mf_data['matches']:
-                response += f"  • {match['name']} (Code: {match['code']})\n"
-            response += "\n"
-        
-        if 'popular_funds' in mf_data:
-            response += f"⭐ POPULAR MUTUAL FUNDS\n"
-            response += f"{'-'*80}\n"
-            for fund in mf_data['popular_funds']:
-                response += f"  • {fund['name']} (Code: {fund['code']})\n"
-            response += "\n"
-        
-        response += f"{'='*80}\n"
-        response += f"✅ Mutual Fund data from AMFI (India)\n"
-        response += f"{'='*80}\n"
-        
-        return response
-    
-    def _format_entertainment(self, entertainment_data: Dict[str, Any], content_type: str) -> str:
-        """Format Entertainment content for display"""
-        response = f"\n{'='*80}\n"
-        
-        if content_type in ['joke', 'programming_joke']:
-            response += f"😄 RANDOM JOKE\n"
-            response += f"{'='*80}\n\n"
-            response += f"Type: {entertainment_data.get('type', 'general').title()}\n\n"
-            response += f"🎭 {entertainment_data.get('setup', '')}\n\n"
-            response += f"😂 {entertainment_data.get('punchline', '')}\n\n"
-        
-        elif content_type == 'dog':
-            response += f"🐕 RANDOM DOG IMAGE\n"
-            response += f"{'='*80}\n\n"
-            response += f"Image URL: {entertainment_data.get('image_url', 'N/A')}\n\n"
-            response += f"Enjoy this cute dog! 🐶\n\n"
-        
-        elif content_type == 'cat':
-            response += f"🐱 RANDOM CAT FACT\n"
-            response += f"{'='*80}\n\n"
-            response += f"Did you know?\n\n"
-            response += f"🐈 {entertainment_data.get('fact', 'N/A')}\n\n"
-            response += f"Upvotes: {entertainment_data.get('upvotes', 0)} 👍\n\n"
-        
-        elif content_type == 'quote':
-            response += f"💭 INSPIRATIONAL QUOTE\n"
-            response += f"{'='*80}\n\n"
-            response += f'"{entertainment_data.get("quote", "N/A")}"\n\n'
-            response += f"— {entertainment_data.get('author', 'Unknown')}\n\n"
-        
-        response += f"{'='*80}\n"
-        
-        return response
-    
-    def _update_memory(self, query: str, response: str):
-        """Update conversation memory and history."""
-        self.memory.append({
-            'timestamp': datetime.utcnow().isoformat(),
+    async def _update_memory_and_learning(self, query: str, response: str):
+        """Update memory and learning systems"""
+        # Add to conversation memory
+        self.conversation_memory.append({
             'query': query,
-            'response': response
+            'response': response,
+            'timestamp': datetime.now().isoformat()
         })
         
-        # Also update conversation handler history
-        self.conversation_handler.add_to_history(query, response)
+        # Update last query/response
+        self.last_query = query
+        self.last_response = response
         
-        # Keep only last 10 exchanges in memory
-        if len(self.memory) > 10:
-            self.memory = self.memory[-10:]
+        # Add to training data for learning
+        self.training_data.append({
+            'query': query,
+            'response': response,
+            'timestamp': datetime.now().isoformat()
+        })
+    
+    async def _generate_iron_man_error_response(self, error: str) -> str:
+        """Generate Iron Man style error response"""
+        error_responses = [
+            f"I apologize, sir. I encountered a technical difficulty: {error}",
+            f"My systems experienced an issue, Mr. Stark: {error}",
+            f"There seems to be a glitch in my processing, sir: {error}",
+            f"I'm experiencing some interference, Mr. Stark: {error}"
+        ]
+        
+        import random
+        return random.choice(error_responses)
     
     def get_memory(self) -> List[Dict[str, Any]]:
         """Get conversation memory."""
-        return self.memory
+        return list(self.conversation_memory)
     
     def clear_memory(self):
         """Clear conversation memory and history."""
-        self.memory = []
-        self.conversation_handler.clear_history()
-        logger.info("Jarvis memory and conversation history cleared")
-        if self.conversation_chain and hasattr(self.conversation_chain, 'memory'):
-            self.conversation_chain.memory.clear()
+        self.conversation_memory.clear()
+        self.training_data.clear()
+        self.last_query = None
+        self.last_response = None
         logger.info("Jarvis memory cleared")
     
     async def generate_greeting(self) -> str:
@@ -1048,18 +747,88 @@ Jarvis: """
             'api_routing_enabled': self.api_router is not None,
             'web_scraping_enabled': self.web_scraper is not None,
             'active_quiz': self.active_quiz_id is not None,
-            'memory_size': len(self.memory),
+            'memory_size': len(self.conversation_memory),
             'temperature': self.temperature,
             'max_length': self.max_length,
             'status': 'operational' if self.model else 'limited',
             'features': [
+                'Iron Man Personality',
                 'Advanced Web Search & Scraping',
                 'Real-time Data Gathering',
-                'Grammar Correction',
-                'Interactive Quizzes',
-                'Knowledge Base',
-                'Feedback System',
-                'Intelligent API Routing',
+                'Smart Query Preprocessing',
+                'Enhanced NLP Analysis',
+                'Automatic Learning',
+                'Time/Date Awareness',
+                'Mathematical Calculations',
+                'Conversational AI',
                 'Personal AI for Heoster'
             ]
         }
+    
+    async def process_feedback(self, query: str, response: str, feedback: str) -> bool:
+        """
+        Process user feedback and trigger learning if positive
+        
+        Args:
+            query: Original query
+            response: JARVIS response
+            feedback: User feedback
+            
+        Returns:
+            True if learning was triggered
+        """
+        try:
+            # Check if feedback is positive
+            positive_indicators = ['good', 'great', 'excellent', 'perfect', 'correct', 'right', 'yes', 'thanks']
+            is_positive = any(indicator in feedback.lower() for indicator in positive_indicators)
+            
+            if is_positive:
+                self.positive_feedback_count += 1
+                logger.info(f"Positive feedback received. Count: {self.positive_feedback_count}")
+                
+                # Trigger learning if threshold reached
+                if self.positive_feedback_count >= self.learning_threshold:
+                    logger.info("Learning threshold reached. Updating knowledge base.")
+                    self.positive_feedback_count = 0  # Reset counter
+                    return True
+            
+            return False
+            
+        except Exception as e:
+            logger.error(f"Feedback processing failed: {e}")
+            return False
+    
+    def get_enhanced_status(self) -> Dict[str, Any]:
+        """Get enhanced status with all new features"""
+        base_status = self.get_status()
+        
+        # Add Iron Man features
+        base_status.update({
+            'iron_man_mode': True,
+            'knowledge_integration': True,
+            'automatic_training': True,
+            'smart_editing': True,
+            'time_awareness': True,
+            'enhanced_features': [
+                'Iron Man Personality',
+                'Smart Knowledge Integration', 
+                'Automatic Learning',
+                'Smart Query Editing',
+                'Time/Date Awareness',
+                'Proactive Assistance',
+                'Enhanced Conversational AI',
+                'Advanced NLP Processing',
+                'Intent Classification',
+                'Response Formatting',
+                'Cache Management',
+                'Metrics Collection'
+            ],
+            'training_stats': {
+                'positive_feedback_count': self.positive_feedback_count,
+                'learning_threshold': self.learning_threshold,
+                'training_data_size': len(self.training_data),
+                'conversation_memory_size': len(self.conversation_memory)
+            }
+        })
+        
+        return base_status

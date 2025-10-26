@@ -302,3 +302,282 @@ Remember: Every student is capable of greatness. Your job is to help them discov
         emoji1, emoji2, title = themes.get(category, themes['general'])
         
         return f"{emoji1} **{title}** {emoji2}\n\n{content}"
+
+
+class EnhancedCodeexPersonality(CodeexPersonality):
+    """Enhanced personality with dynamic tone adjustment and context awareness"""
+    
+    def __init__(self):
+        super().__init__()
+        from core.constants import PersonalitySettings
+        self.tone_modifiers = PersonalitySettings.TONE_MODIFIERS
+        self.tone_threshold = PersonalitySettings.TONE_ADJUSTMENT_THRESHOLD
+        self.context_memory = []
+    
+    def adjust_tone(self, response: str, sentiment: str, context: Dict) -> str:
+        """
+        Dynamically adjust tone based on context and sentiment.
+        
+        Args:
+            response: Original response
+            sentiment: Detected sentiment
+            context: Conversation context
+            
+        Returns:
+            Tone-adjusted response
+        """
+        # Determine appropriate tone based on context
+        tone = self._select_tone(sentiment, context)
+        
+        # Apply tone modifier
+        if tone in self.tone_modifiers:
+            import random
+            modifier = random.choice(self.tone_modifiers[tone])
+            return f"{modifier} {response}"
+        
+        return response
+    
+    def _select_tone(self, sentiment: str, context: Dict) -> str:
+        """Select appropriate tone based on sentiment and context"""
+        # If user is struggling, be supportive
+        if context.get('difficulty_level') == 'high' or sentiment == 'frustrated':
+            return 'supportive'
+        
+        # If user succeeded, celebrate
+        elif context.get('success') or sentiment == 'happy':
+            return 'celebratory'
+        
+        # If user is learning, encourage
+        elif context.get('learning_mode') or sentiment == 'curious':
+            return 'encouraging'
+        
+        # Default to excited for positive interactions
+        elif sentiment in ['positive', 'neutral']:
+            return 'excited'
+        
+        # Professional tone for serious contexts
+        elif context.get('formal_context'):
+            return 'professional'
+        
+        return 'encouraging'  # Default fallback
+    
+    def create_themed_response(self, content: str, theme: str) -> str:
+        """
+        Create themed responses for different contexts.
+        
+        Args:
+            content: Response content
+            theme: Theme identifier
+            
+        Returns:
+            Themed response
+        """
+        themes = {
+            'debugging': {
+                'prefix': '🔍 Debug Mode Activated!',
+                'emoji': '🐛',
+                'style': 'Let\'s hunt down that bug together!',
+                'color': 'red'
+            },
+            'learning': {
+                'prefix': '📚 Learning Time!',
+                'emoji': '✨',
+                'style': 'Every expert was once a beginner!',
+                'color': 'blue'
+            },
+            'achievement': {
+                'prefix': '🏆 Achievement Unlocked!',
+                'emoji': '🎊',
+                'style': 'You\'re crushing it!',
+                'color': 'gold'
+            },
+            'coding': {
+                'prefix': '💻 Code Wizard Mode!',
+                'emoji': '⚡',
+                'style': 'Time to write some magical code!',
+                'color': 'green'
+            },
+            'math': {
+                'prefix': '🔢 Math Magic!',
+                'emoji': '📐',
+                'style': 'Numbers are just another language!',
+                'color': 'purple'
+            },
+            'search': {
+                'prefix': '🔍 Information Quest!',
+                'emoji': '🌐',
+                'style': 'Let\'s discover something amazing!',
+                'color': 'cyan'
+            }
+        }
+        
+        theme_config = themes.get(theme, themes['learning'])
+        
+        response = f"{theme_config['prefix']} {theme_config['emoji']}\n\n"
+        response += f"{content}\n\n"
+        response += f"✨ {theme_config['style']}"
+        
+        return response
+    
+    def adapt_to_user_style(self, user_history: List[Dict], response: str) -> str:
+        """
+        Adapt response style based on user interaction history.
+        
+        Args:
+            user_history: List of previous interactions
+            response: Original response
+            
+        Returns:
+            Style-adapted response
+        """
+        if not user_history:
+            return response
+        
+        # Analyze user preferences from history
+        preferences = self._analyze_user_preferences(user_history)
+        
+        # Adjust response based on preferences
+        if preferences.get('prefers_concise'):
+            response = self._make_concise(response)
+        elif preferences.get('prefers_detailed'):
+            response = self._add_details(response)
+        
+        if preferences.get('likes_examples'):
+            response = self._add_example_hint(response)
+        
+        if preferences.get('formal_tone'):
+            response = self._formalize_tone(response)
+        
+        return response
+    
+    def _analyze_user_preferences(self, history: List[Dict]) -> Dict[str, bool]:
+        """Analyze user preferences from interaction history"""
+        preferences = {
+            'prefers_concise': False,
+            'prefers_detailed': False,
+            'likes_examples': False,
+            'formal_tone': False
+        }
+        
+        # Simple analysis based on user queries
+        for interaction in history[-10:]:  # Last 10 interactions
+            query = interaction.get('query', '').lower()
+            
+            if any(word in query for word in ['brief', 'short', 'quick', 'tldr']):
+                preferences['prefers_concise'] = True
+            
+            if any(word in query for word in ['detail', 'explain', 'elaborate', 'more']):
+                preferences['prefers_detailed'] = True
+            
+            if any(word in query for word in ['example', 'show me', 'demonstrate']):
+                preferences['likes_examples'] = True
+            
+            if any(word in query for word in ['please', 'could you', 'would you']):
+                preferences['formal_tone'] = True
+        
+        return preferences
+    
+    def _make_concise(self, response: str) -> str:
+        """Make response more concise"""
+        # Simple approach - could be enhanced with NLP
+        sentences = response.split('. ')
+        if len(sentences) > 3:
+            # Keep first 2 and last sentence
+            concise = '. '.join(sentences[:2] + [sentences[-1]])
+            return concise
+        return response
+    
+    def _add_details(self, response: str) -> str:
+        """Add more details to response"""
+        # Add helpful context
+        return f"{response}\n\n💡 **Additional Context:** This information can help you understand the topic better. Feel free to ask for more specific details!"
+    
+    def _add_example_hint(self, response: str) -> str:
+        """Add hint about examples"""
+        return f"{response}\n\n🎯 **Tip:** Ask me for examples if you'd like to see this in action!"
+    
+    def _formalize_tone(self, response: str) -> str:
+        """Make tone more formal"""
+        # Replace casual expressions
+        formal_replacements = {
+            "Let's": "Let us",
+            "You're": "You are",
+            "It's": "It is",
+            "We're": "We are",
+            "That's": "That is"
+        }
+        
+        for casual, formal in formal_replacements.items():
+            response = response.replace(casual, formal)
+        
+        return response
+    
+    def generate_contextual_greeting(self, context: Dict) -> str:
+        """
+        Generate contextual greeting based on situation.
+        
+        Args:
+            context: Current context information
+            
+        Returns:
+            Contextual greeting
+        """
+        time_greeting = self.get_greeting()
+        
+        # Add context-specific elements
+        if context.get('returning_user'):
+            return f"{time_greeting} Welcome back! Ready to continue our learning journey?"
+        
+        if context.get('first_time'):
+            return f"{time_greeting} Welcome to Codeex! I'm excited to help you learn and grow! ✨"
+        
+        if context.get('error_context'):
+            return f"{time_greeting} I see you might be facing a challenge. Don't worry, we'll solve it together! 💪"
+        
+        return time_greeting
+    
+    def create_celebration_message(self, achievement: str, difficulty: str = 'medium') -> str:
+        """
+        Create celebration message for achievements.
+        
+        Args:
+            achievement: What was achieved
+            difficulty: Difficulty level of achievement
+            
+        Returns:
+            Celebration message
+        """
+        celebration_levels = {
+            'easy': {
+                'emoji': '🌟',
+                'message': 'Great job!',
+                'encouragement': 'You\'re building momentum!'
+            },
+            'medium': {
+                'emoji': '🎉',
+                'message': 'Excellent work!',
+                'encouragement': 'You\'re really getting the hang of this!'
+            },
+            'hard': {
+                'emoji': '🏆',
+                'message': 'Outstanding achievement!',
+                'encouragement': 'You\'ve mastered something challenging!'
+            },
+            'expert': {
+                'emoji': '👑',
+                'message': 'Legendary performance!',
+                'encouragement': 'You\'re becoming a true expert!'
+            }
+        }
+        
+        level = celebration_levels.get(difficulty, celebration_levels['medium'])
+        
+        return f"{level['emoji']} {level['message']} {level['emoji']}\n\n" \
+               f"Achievement: {achievement}\n\n" \
+               f"✨ {level['encouragement']} Keep up the amazing work!"
+
+
+# Enhanced personality instance
+def get_enhanced_personality() -> EnhancedCodeexPersonality:
+    """Get enhanced personality instance"""
+    return EnhancedCodeexPersonality()

@@ -1,117 +1,211 @@
-# 🚀 Quick Reference - JARVIS Assistant
+# 🚀 JARVIS MASTER - Quick Reference Card
 
-## ⚡ Quick Commands
+## ⚡ Quick Start
 
-### Test News (Working Now!)
 ```bash
-python simple_news_test.py
-```
+# Setup (first time only)
+python setup_jarvis.py
 
-### Start Assistant
-```bash
-python -m core.main start
-```
+# Start JARVIS
+python start_jarvis.py
 
-### Single Query
-```bash
-python -m core.main query --query "What's the latest news?"
-```
-
-### Generate Training Data
-```bash
-python scripts/generate_training_data.py
+# Run tests
+python test_jarvis_complete.py
 ```
 
 ---
 
-## 🔑 API Keys
+## 💬 Common Commands
 
-### News API ✅
+### Conversational
 ```
-Key: 751c492c240d46c2bb46c631ddd59626
-File: .env
-Status: Active
+Hello Jarvis
+How are you?
+What can you do?
+Help
+Status
 ```
 
-### Weather API ⚠️
+### Web Search
 ```
-Get key: https://openweathermap.org/api
-Add to: .env file
-Status: Needs setup (5 min)
+Search for [topic]
+Find information about [topic]
+Look up [topic]
+```
+
+### Indian Finance 🇮🇳
+```
+What's the Bitcoin price in INR?
+Show me currency exchange rates
+Check mutual fund NAV
+SBI Bluechip fund NAV
+```
+
+### Railway 🚂
+```
+Show trains from Muzaffarnagar
+Train schedule for [train number]
+Railway information
+```
+
+### Entertainment 😄
+```
+Tell me a joke
+Tell me a programming joke
+Show me a dog image
+Give me a cat fact
+Give me an inspirational quote
+```
+
+### Knowledge 📚
+```
+What is [topic]?
+Tell me about [topic]
+Explain [concept]
+```
+
+### Math 🔢
+```
+Calculate 25 * 4 + 10
+Solve 100 / 5
+What is 15 + 30?
 ```
 
 ---
 
-## 💬 Example Queries
+## 🎯 Features at a Glance
 
-### News (Working!)
-- "What's the latest news?"
-- "Show me cricket news"
-- "Get technology news"
-- "What's happening in India?"
-
-### Weather (Needs API key)
-- "What's the weather?"
-- "How's the weather in Delhi?"
-- "Temperature in Muzaffarnagar"
-
-### Math
-- "What is 5 times 7?"
-- "Calculate 2 + 2"
-- "Derivative of x squared"
-
-### General
-- "What is AI?"
-- "Explain Python"
-- "How does this work?"
+| Feature | Status | API Key Required |
+|---------|--------|------------------|
+| Web Search | ✅ | No |
+| Web Scraping | ✅ | No |
+| Bitcoin Price (INR) | ✅ | No |
+| Currency Rates | ✅ | No |
+| Mutual Funds | ✅ | No |
+| Entertainment | ✅ | No |
+| Wikipedia | ✅ | No |
+| Conversations | ✅ | No |
+| Math | ✅ | No |
+| Weather | ✅ | Yes (optional) |
+| News | ✅ | Yes (optional) |
+| Railway | ✅ | Yes (optional) |
 
 ---
 
 ## 📁 Key Files
 
+| File | Purpose |
+|------|---------|
+| `jarvis_master.py` | Main entry point |
+| `start_jarvis.py` | Simple launcher |
+| `setup_jarvis.py` | Setup script |
+| `test_jarvis_complete.py` | Test suite |
+| `JARVIS_COMPLETE_GUIDE.md` | Complete documentation |
+| `README_JARVIS_MASTER.md` | Quick start guide |
+
+---
+
+## 🔧 Configuration
+
+### No API Keys (Default)
+Most features work without any configuration!
+
+### With API Keys (Optional)
+Create `.env` file:
+```env
+OPENWEATHER_API_KEY=your_key_here
+NEWS_API_KEY=your_key_here
+RAILWAY_API_KEY=your_key_here
 ```
-.env                          # API keys
-simple_news_test.py          # Test news
-SETUP_COMPLETE.md            # Full guide
-INDIA_API_SETUP.md           # India setup
-core/action_planner.py       # Action planning
-execution/news_api.py        # News API
-execution/weather_api.py     # Weather API
+
+---
+
+## 🐛 Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Slow first response | Normal - models loading |
+| Missing dependencies | Run `python setup_jarvis.py` |
+| Web search not working | Install: `pip install duckduckgo-search` |
+| Import errors | Check Python version (3.8+) |
+
+---
+
+## 📊 System Status
+
+Check anytime by typing: `status`
+
+Shows:
+- System operational status
+- Session information
+- Interaction count
+- Feature availability
+- Brain status
+
+---
+
+## 💡 Pro Tips
+
+1. **First query is slow** - Models are loading. Subsequent queries are fast.
+2. **Most features work offline** - Except web search and real-time data.
+3. **No API keys needed** - For most features!
+4. **Type naturally** - No special commands required.
+5. **Context aware** - Jarvis remembers your conversation.
+
+---
+
+## 🎓 Example Session
+
+```
+$ python start_jarvis.py
+
+Jarvis: Good morning, sir. Jarvis at your service. How may I assist you today?
+
+You: Hello Jarvis
+
+Jarvis: Good morning, Heoster. Jarvis at your service. Systems are online and ready.
+
+You: What's the Bitcoin price in INR?
+
+Jarvis: [Shows detailed Bitcoin price in Indian Rupees with exchange rates]
+
+You: Tell me a joke
+
+Jarvis: [Shares a random joke]
+
+You: Search for Python tutorials
+
+Jarvis: [Performs web search, scrapes results, provides detailed information]
+
+You: Thanks!
+
+Jarvis: You're most welcome, sir. I'm here whenever you need assistance.
+
+You: exit
+
+Jarvis: Until next time, Heoster. Jarvis standing by.
 ```
 
 ---
 
-## 🎯 Default Settings
+## 📚 More Information
 
-**Location**: Muzaffarnagar, UP, India
-**Country**: India (IN)
-**Language**: English
-**Units**: Metric (Celsius)
-
----
-
-## 📊 Status
-
-✅ Core System: Complete
-✅ News API: Active
-✅ Action Planning: Complete
-✅ Data Generation: Working
-⚠️ Weather API: Needs key
-⚠️ Voice: Future
+- **Complete Guide**: [JARVIS_COMPLETE_GUIDE.md](JARVIS_COMPLETE_GUIDE.md)
+- **Quick Start**: [README_JARVIS_MASTER.md](README_JARVIS_MASTER.md)
+- **Summary**: [JARVIS_MASTER_SUMMARY.md](JARVIS_MASTER_SUMMARY.md)
 
 ---
 
-## 🆘 Quick Fixes
+## 🎉 That's It!
 
-**News not working?**
-→ Check `.env` has `NEWS_API_KEY=751c492c...`
+You're ready to use JARVIS MASTER!
 
-**Weather shows demo data?**
-→ Add `OPENWEATHER_API_KEY` to `.env`
+```bash
+python start_jarvis.py
+```
 
-**Import errors?**
-→ Run `pip install -r requirements.txt`
+**Enjoy your personal AI assistant!** 🚀
 
 ---
 
-**Ready to start?** → `python -m core.main start`
+**Built with ❤️ by Codeex AI Company**

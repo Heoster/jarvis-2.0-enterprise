@@ -1,0 +1,23 @@
+{
+  "enabled": true,
+  "name": "Jarvis Code Quality & Brain Analyzer",
+  "description": "Analyzes modified Python files for code quality issues, design patterns, and suggests Jarvis brain architecture updates including intent classification, router logic, tool modules, memory context, and prompt engine improvements",
+  "version": "1",
+  "when": {
+    "type": "fileCreated",
+    "patterns": [
+      "core/*.py",
+      "execution/*.py",
+      "storage/*.py",
+      "monitoring/*.py",
+      "voice/*.py",
+      "server/*.py",
+      "examples/*.py",
+      "tests/*.py"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "🧙 **Jarvis Brain Architecture Analysis**\n\nAnalyze the modified code files and provide:\n\n## 🔧 Code Quality Analysis\n- **Code Smells**: Identify duplicated code, long methods, large classes, complex conditionals\n- **Design Patterns**: Suggest Factory, Strategy, Observer, Singleton, or other applicable patterns\n- **Python Best Practices**: Check PEP 8 compliance, type hints, docstrings, naming conventions\n- **Readability & Maintainability**: Evaluate code clarity, modularity, and documentation\n- **Performance**: Identify optimization opportunities (caching, async operations, vectorization)\n\n## 🧠 Jarvis Brain Architecture Updates\nBased on code changes, recommend updates to:\n\n### 1. Intent Classification Improvements\n- New intents to add (e.g., \"modding_help\", \"vision_analysis\", \"quiz_generation\")\n- Entity patterns discovered (e.g., mod names, config files, topics)\n- Training data suggestions for better classification\n\n### 2. Router Logic Enhancements\n- Better decision-making flows in `jarvis_brain.py` or `api_router.py`\n- Multi-step conversation handling\n- Fallback and clarification strategies\n- Tool routing optimizations\n\n### 3. Tool Module Optimizations\n- Modular design improvements for `grammar_corrector.py`, `quiz_engine.py`, `vision.py`, etc.\n- New capabilities to add\n- Input/output standardization\n- Stateless design patterns\n\n### 4. Memory Context Insights\n- Better context tracking in `contextual_memory.py` or `memory_store.py`\n- Personalization opportunities (student preferences, learning style)\n- Emotional tone detection integration\n- Session history improvements\n\n### 5. Prompt Engine Refinements\n- Enhanced magical personality in `prompt_engine.py` or `codeex_personality.py`\n- Response formatting improvements\n- Themed phrases and engagement strategies\n\n### 6. Output Formatter Improvements\n- Better markdown usage\n- Emoji integration for engagement\n- Themed responses (\"Let's cast a spell!\", \"Time to debug this potion!\")\n\n## ✨ Actionable Recommendations\nProvide specific refactoring suggestions:\n- **HIGH Priority**: Critical improvements (security, major bugs, architecture issues)\n- **MEDIUM Priority**: Quality improvements (readability, maintainability, patterns)\n- **LOW Priority**: Nice-to-haves (minor optimizations, style improvements)\n\nInclude:\n- Specific file/line references\n- Before/after code examples\n- Rationale for each suggestion\n- Impact on existing functionality\n\nFormat with clear sections, code blocks, and emojis (🧠 brain, 🔧 fixes, ✨ enhancements, 🎯 priorities)"
+  }
+}

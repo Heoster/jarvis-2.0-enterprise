@@ -1,185 +1,381 @@
-"""
-JARVIS Unified - Complete Integration of Original + Enhanced Features
-Combines the full-featured original JARVIS with JARVIS 2.0 enhancements
-"""
+"""Unified JARVIS with all enhanced features integrated."""
 
 import asyncio
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from datetime import datetime
 
 from core.logger import get_logger
-from core.jarvis_brain import JarvisBrain
-from core.intent_classifier_enhanced import EnhancedIntentClassifier
-from core.prompt_engine_enhanced import EnhancedPromptEngine
-from storage.contextual_memory_enhanced import EnhancedContextualMemory
-from core.sentiment_analyzer import SentimentAnalyzer
-from core.query_decomposer import QueryDecomposer
-from core.semantic_matcher import SemanticMatcher
+from core.models import Intent, IntentCategory
 
 logger = get_logger(__name__)
 
 
-class JarvisUnified:
+class UnifiedJarvis:
     """
-    Unified JARVIS combining:
-    - Original: Web search, API routing, real-time data, transformers, LangChain
-    - Enhanced: Intent classification, sentiment analysis, contextual memory, semantic matching
+    Unified JARVIS combining all enhanced features:
+    - Enhanced intent classification with NER
+    - Semantic matching
+    - Contextual memory with student profiles
+    - Query decomposition
+    - Sentiment analysis
+    - Knowledge graph tracking
+    - Magical prompt engineering
     """
     
-    def __init__(self):
-        logger.info("Initializing JARVIS Unified - Complete System")
+    def __init__(
+        self,
+        student_id: str = "heoster",
+        personality: str = "magical_mentor",
+        enable_all_features: bool = True
+    ):
+        self.student_id = student_id
+        self.personality = personality
+        self.enable_all_features = enable_all_features
         
-        # Original JARVIS Brain (full features)
-        self.brain = JarvisBrain()
+        # Initialize enhanced components
+        self._initialize_components()
         
-        # Enhanced Components
-        self.enhanced_classifier = EnhancedIntentClassifier()
-        self.enhanced_prompt_engine = EnhancedPromptEngine()
-        self.enhanced_memory = EnhancedContextualMemory()
-        self.sentiment_analyzer = SentimentAnalyzer()
-        self.query_decomposer = QueryDecomposer()
-        self.semantic_matcher = SemanticMatcher()
-        
-        # Session management
-        self.session_id = None
-        
-        logger.info("JARVIS Unified initialized with all features")
+        logger.info(f"Unified JARVIS initialized for {student_id}")
     
-    async def process_query(self, query: str, context: Optional[Dict[str, Any]] = None) -> str:
+    def _initialize_components(self):
+        """Initialize all enhanced components."""
+        try:
+            # Enhanced Intent Classification
+            from core.intent_classifier_enhanced import EnhancedIntentClassifier
+            self.enhanced_classifier = EnhancedIntentClassifier()
+            logger.info("✅ Enhanced intent classifier loaded")
+        except Exception as e:
+            logger.warning(f"Enhanced classifier unavailable: {e}")
+            self.enhanced_classifier = None
+        
+        try:
+            # Semantic Matching
+            from core.semantic_matcher import SemanticMatcher
+            self.semantic_matcher = SemanticMatcher()
+            logger.info("✅ Semantic matcher loaded")
+        except Exception as e:
+            logger.warning(f"Semantic matcher unavailable: {e}")
+            self.semantic_matcher = None
+        
+        try:
+            # Enhanced Memory
+            from storage.contextual_memory_enhanced import EnhancedContextualMemory
+            self.enhanced_memory = EnhancedContextualMemory(student_id=self.student_id)
+            logger.info("✅ Enhanced memory loaded")
+        except Exception as e:
+            logger.warning(f"Enhanced memory unavailable: {e}")
+            self.enhanced_memory = None
+        
+        try:
+            # Query Decomposer
+            from core.query_decomposer import QueryDecomposer
+            self.query_decomposer = QueryDecomposer()
+            logger.info("✅ Query decomposer loaded")
+        except Exception as e:
+            logger.warning(f"Query decomposer unavailable: {e}")
+            self.query_decomposer = None
+        
+        try:
+            # Sentiment Analyzer
+            from core.sentiment_analyzer import SentimentAnalyzer
+            self.sentiment_analyzer = SentimentAnalyzer()
+            logger.info("✅ Sentiment analyzer loaded")
+        except Exception as e:
+            logger.warning(f"Sentiment analyzer unavailable: {e}")
+            self.sentiment_analyzer = None
+        
+        try:
+            # Knowledge Graph
+            from core.knowledge_graph import KnowledgeGraph
+            self.knowledge_graph = KnowledgeGraph(student_id=self.student_id)
+            logger.info("✅ Knowledge graph loaded")
+        except Exception as e:
+            logger.warning(f"Knowledge graph unavailable: {e}")
+            self.knowledge_graph = None
+        
+        try:
+            # Enhanced Prompt Engine
+            from core.prompt_engine_enhanced import EnhancedPromptEngine
+            self.prompt_engine = EnhancedPromptEngine(personality=self.personality)
+            logger.info("✅ Enhanced prompt engine loaded")
+        except Exception as e:
+            logger.warning(f"Prompt engine unavailable: {e}")
+            self.prompt_engine = None
+        
+        # Fallback to original JARVIS brain if needed
+        try:
+            from core.jarvis_brain import JarvisBrain
+            self.jarvis_brain = JarvisBrain()
+            logger.info("✅ Original JARVIS brain loaded as fallback")
+        except Exception as e:
+            logger.warning(f"Original JARVIS brain unavailable: {e}")
+            self.jarvis_brain = None
+    
+    async def process_query(
+        self,
+        query: str,
+        context: Optional[Dict[str, Any]] = None
+    ) -> str:
         """
-        Process query using unified system.
+        Process query with all enhanced features.
         
         Args:
             query: User query
-            context: Optional context
-        
+            context: Additional context
+            
         Returns:
-            Complete response
+            Generated response
         """
         try:
-            # 1. Enhanced Intent Classification
-            enhanced_intent = await self.enhanced_classifier.classify(query, context)
-            logger.info(f"Enhanced intent: {enhanced_intent.category.value} (confidence: {enhanced_intent.confidence:.2f})")
+            logger.info(f"Processing query: {query}")
             
-            # 2. Sentiment Analysis
-            sentiment = self.sentiment_analyzer.analyze(query)
-            logger.info(f"Sentiment: {sentiment['mood']} (intensity: {sentiment['intensity']:.1f})")
+            # 1. Analyze sentiment
+            sentiment = None
+            if self.sentiment_analyzer:
+                sentiment = self.sentiment_analyzer.analyze(query)
+                logger.info(f"Sentiment: {sentiment['mood']} (confidence: {sentiment['confidence']:.2f})")
             
-            # 3. Get Enhanced Context
-            enhanced_context = await self.enhanced_memory.get_context_for_query(query)
+            # 2. Check if query needs decomposition
+            if self.query_decomposer and self.query_decomposer._needs_decomposition(query):
+                logger.info("Query requires decomposition")
+                return await self._process_compound_query(query, sentiment, context)
             
-            # 4. Merge contexts
-            full_context = {
-                **(context or {}),
-                'enhanced_intent': enhanced_intent,
-                'sentiment': sentiment,
-                'enhanced_memory': enhanced_context,
-                'intent': enhanced_intent  # For compatibility with original brain
-            }
-            
-            # 5. Check if query needs decomposition
-            if enhanced_intent.confidence < 0.6 or len(query.split()) > 15:
-                tasks = await self.query_decomposer.decompose(query)
-                if len(tasks) > 1:
-                    logger.info(f"Query decomposed into {len(tasks)} tasks")
-                    full_context['decomposed_tasks'] = tasks
-            
-            # 6. Use original JARVIS Brain for full response generation
-            # (includes web search, API routing, transformers, etc.)
-            response = await self.brain.generate_response(query, full_context)
-            
-            # 7. Adjust response based on sentiment
-            if sentiment['mood'] == 'frustrated':
-                response = self._add_supportive_tone(response)
-            elif sentiment['mood'] == 'excited':
-                response = self._add_enthusiastic_tone(response)
-            
-            # 8. Update enhanced memory
-            await self.enhanced_memory.add_interaction(
-                query,
-                response,
-                {
-                    'intent': enhanced_intent.category.value,
-                    'sentiment': sentiment['mood'],
-                    'confidence': enhanced_intent.confidence
-                }
-            )
-            
-            return response
+            # 3. Process single query
+            return await self._process_single_query(query, sentiment, context)
             
         except Exception as e:
-            logger.error(f"Unified processing failed: {e}")
-            # Fallback to original brain
-            return await self.brain.generate_response(query, context)
+            logger.error(f"Query processing failed: {e}")
+            return self._generate_error_response(str(e))
     
-    def _add_supportive_tone(self, response: str) -> str:
-        """Add supportive tone for frustrated users."""
-        supportive_prefixes = [
-            "I understand this can be challenging. ",
-            "Let me help break this down for you. ",
-            "I'm here to help you through this. "
-        ]
+    async def _process_compound_query(
+        self,
+        query: str,
+        sentiment: Optional[Dict[str, Any]],
+        context: Optional[Dict[str, Any]]
+    ) -> str:
+        """Process compound query with decomposition."""
+        tasks = await self.query_decomposer.decompose(query)
+        logger.info(f"Decomposed into {len(tasks)} tasks")
         
-        if not any(response.startswith(prefix) for prefix in supportive_prefixes):
-            import random
-            return random.choice(supportive_prefixes) + response
+        responses = []
+        for i, task in enumerate(tasks, 1):
+            logger.info(f"Processing task {i}/{len(tasks)}: {task['task']}")
+            
+            # Check dependencies
+            deps = task.get('dependencies', [])
+            if deps and not all(d < i-1 for d in deps):
+                logger.warning(f"Dependencies not met for task {i}")
+                continue
+            
+            # Process task
+            response = await self._process_single_query(
+                task['task'],
+                sentiment,
+                context
+            )
+            responses.append(f"**Step {i}:** {response}")
+        
+        return "\n\n".join(responses)
+    
+    async def _process_single_query(
+        self,
+        query: str,
+        sentiment: Optional[Dict[str, Any]],
+        context: Optional[Dict[str, Any]]
+    ) -> str:
+        """Process single query with all enhancements."""
+        # 1. Enhanced intent classification
+        intent = None
+        if self.enhanced_classifier:
+            intent = await self.enhanced_classifier.classify(query, context)
+            logger.info(f"Intent: {intent.category.value} (confidence: {intent.confidence:.2f})")
+        
+        # 2. Get adaptive context from memory
+        adaptive_context = {}
+        if self.enhanced_memory:
+            adaptive_context = self.enhanced_memory.get_adaptive_context()
+            logger.debug(f"Adaptive context: {adaptive_context.get('emotional_state')}")
+        
+        # 3. Build enhanced prompt
+        prompt = query
+        if self.prompt_engine and intent:
+            prompt = self.prompt_engine.build_prompt(
+                intent=intent,
+                query=query,
+                student_name=self.student_id.title(),
+                emotional_state=sentiment['mood'] if sentiment else 'neutral',
+                **adaptive_context
+            )
+        
+        # 4. Generate response (use original JARVIS brain or simple response)
+        if self.jarvis_brain:
+            response = await self.jarvis_brain.generate_response(query, context)
+        else:
+            response = self._generate_simple_response(query, intent, sentiment)
+        
+        # 5. Add magical touch based on sentiment
+        if sentiment and self.prompt_engine:
+            response = self.prompt_engine.add_magical_touch(
+                response,
+                sentiment=sentiment['mood']
+            )
+        
+        # 6. Update memory
+        if self.enhanced_memory:
+            self.enhanced_memory.add_exchange(
+                user_input=query,
+                assistant_response=response,
+                intent=intent.category.value if intent else None,
+                sentiment=sentiment['mood'] if sentiment else 'neutral'
+            )
+        
+        # 7. Track concept in knowledge graph
+        if self.knowledge_graph and intent:
+            self._track_concept(query, intent)
+        
         return response
     
-    def _add_enthusiastic_tone(self, response: str) -> str:
-        """Add enthusiastic tone for excited users."""
-        if not response.endswith('!') and not response.endswith('✨'):
-            return response + " ✨"
-        return response
-    
-    async def start_session(self, session_id: str):
-        """Start a new session."""
-        self.session_id = session_id
-        self.enhanced_memory.start_session(session_id)
-        logger.info(f"Session started: {session_id}")
-    
-    async def get_session_summary(self) -> Dict[str, Any]:
-        """Get comprehensive session summary."""
-        enhanced_summary = await self.enhanced_memory.get_learning_summary()
-        brain_status = self.brain.get_status()
+    def _generate_simple_response(
+        self,
+        query: str,
+        intent: Optional[Intent],
+        sentiment: Optional[Dict[str, Any]]
+    ) -> str:
+        """Generate simple response when JARVIS brain unavailable."""
+        if not intent:
+            return "I'm processing your request. How can I help you further?"
         
-        return {
-            'session_id': self.session_id,
-            'enhanced_features': enhanced_summary,
-            'brain_status': brain_status,
-            'total_interactions': enhanced_summary.get('total_interactions', 0)
+        category = intent.category
+        
+        if category == IntentCategory.QUESTION:
+            return f"That's a great question about {query}. Let me help you understand this concept."
+        elif category == IntentCategory.CODE:
+            return "I can help you with that code. Let me provide a solution."
+        elif category == IntentCategory.MATH:
+            return "I'll calculate that for you."
+        elif category == IntentCategory.COMMAND:
+            return "I'll execute that command."
+        else:
+            return "I'm here to help! What would you like to know?"
+    
+    def _track_concept(self, query: str, intent: Intent):
+        """Track concepts in knowledge graph."""
+        # Extract potential concepts from query
+        concepts = []
+        
+        query_lower = query.lower()
+        
+        # Common programming concepts
+        concept_keywords = {
+            'function': 'functions',
+            'loop': 'loops',
+            'class': 'classes',
+            'variable': 'variables',
+            'list': 'lists',
+            'dictionary': 'dictionaries',
+            'minecraft': 'minecraft_basics',
+            'mod': 'forge_setup'
         }
+        
+        for keyword, concept in concept_keywords.items():
+            if keyword in query_lower:
+                concepts.append(concept)
+        
+        # Record attempts for identified concepts
+        for concept in concepts:
+            if concept in self.knowledge_graph.graph:
+                self.knowledge_graph.record_attempt(concept, success=True)
+                logger.debug(f"Tracked concept: {concept}")
     
-    async def get_greeting(self) -> str:
-        """Get personalized greeting."""
-        return await self.brain.generate_greeting()
+    def _generate_error_response(self, error: str) -> str:
+        """Generate friendly error response."""
+        return f"🔧 Oops! I encountered an issue: {error}\n\nLet me try a different approach. Could you rephrase your question?"
     
-    async def get_farewell(self) -> str:
-        """Get personalized farewell."""
-        return await self.brain.generate_farewell()
+    def get_student_progress(self) -> Dict[str, Any]:
+        """Get comprehensive student progress report."""
+        progress = {
+            'student_id': self.student_id,
+            'timestamp': datetime.utcnow().isoformat()
+        }
+        
+        # Memory stats
+        if self.enhanced_memory:
+            progress['memory'] = {
+                'total_interactions': self.enhanced_memory.student_profile.get('total_interactions', 0),
+                'session_count': self.enhanced_memory.student_profile.get('session_count', 0),
+                'emotional_state': self.enhanced_memory.student_profile.get('emotional_state'),
+                'learning_style': self.enhanced_memory.student_profile.get('learning_style')
+            }
+        
+        # Knowledge graph stats
+        if self.knowledge_graph:
+            mastered = {
+                node for node in self.knowledge_graph.graph.nodes()
+                if self.knowledge_graph.graph.nodes[node].get('mastered', False)
+            }
+            progress['knowledge'] = self.knowledge_graph.get_progress_summary(mastered)
+        
+        return progress
+    
+    def get_learning_recommendations(self) -> List[str]:
+        """Get personalized learning recommendations."""
+        recommendations = []
+        
+        if self.knowledge_graph and self.enhanced_memory:
+            # Get mastered concepts
+            mastered = {
+                node for node in self.knowledge_graph.graph.nodes()
+                if self.knowledge_graph.graph.nodes[node].get('mastered', False)
+            }
+            
+            # Get next concepts
+            next_concepts = self.knowledge_graph.get_next_concepts(mastered, max_difficulty=5)
+            
+            for concept, score in next_concepts[:3]:
+                info = self.knowledge_graph.get_concept_info(concept)
+                recommendations.append(
+                    f"📚 {concept.replace('_', ' ').title()} "
+                    f"(Difficulty: {'⭐' * info['difficulty']}, Readiness: {score:.1f})"
+                )
+        
+        return recommendations
+    
+    async def end_session(self):
+        """End session and save all data."""
+        logger.info("Ending session...")
+        
+        # Save memory
+        if self.enhanced_memory:
+            self.enhanced_memory.save_student_profile()
+            logger.info("✅ Student profile saved")
+        
+        # Save knowledge graph
+        if self.knowledge_graph:
+            self.knowledge_graph.save_graph()
+            logger.info("✅ Knowledge graph saved")
+        
+        # Generate session summary
+        if self.enhanced_memory:
+            summary = self.enhanced_memory.get_session_summary()
+            logger.info(f"Session summary: {summary}")
+            return summary
+        
+        return {}
     
     def get_status(self) -> Dict[str, Any]:
-        """Get complete system status."""
+        """Get system status."""
         return {
-            'unified_system': 'operational',
-            'original_features': self.brain.get_status(),
-            'enhanced_features': {
-                'intent_classifier': self.enhanced_classifier.get_model_info(),
-                'sentiment_analyzer': 'operational',
-                'contextual_memory': 'operational',
-                'semantic_matcher': 'operational',
-                'query_decomposer': 'operational'
+            'student_id': self.student_id,
+            'personality': self.personality,
+            'components': {
+                'enhanced_classifier': self.enhanced_classifier is not None,
+                'semantic_matcher': self.semantic_matcher is not None,
+                'enhanced_memory': self.enhanced_memory is not None,
+                'query_decomposer': self.query_decomposer is not None,
+                'sentiment_analyzer': self.sentiment_analyzer is not None,
+                'knowledge_graph': self.knowledge_graph is not None,
+                'prompt_engine': self.prompt_engine is not None,
+                'jarvis_brain': self.jarvis_brain is not None
             },
-            'session_id': self.session_id
+            'features_enabled': self.enable_all_features
         }
-
-
-# Singleton instance
-_jarvis_unified_instance = None
-
-
-async def get_jarvis_unified() -> JarvisUnified:
-    """Get or create unified JARVIS instance."""
-    global _jarvis_unified_instance
-    if _jarvis_unified_instance is None:
-        _jarvis_unified_instance = JarvisUnified()
-    return _jarvis_unified_instance

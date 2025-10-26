@@ -1,7 +1,4 @@
-"""
-JARVIS 2.0 Enterprise Edition - Quick Demo
-Demonstrates all enhanced features in action.
-"""
+"""Demo script showcasing all enhanced JARVIS features."""
 
 import asyncio
 import sys
@@ -10,307 +7,328 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from core.intent_classifier_enhanced import EnhancedIntentClassifier
-from core.prompt_engine_enhanced import EnhancedPromptEngine
-from storage.contextual_memory_enhanced import EnhancedContextualMemory
-from core.semantic_matcher import SemanticMatcher
-from core.sentiment_analyzer import SentimentAnalyzer
-from core.query_decomposer import QueryDecomposer
+from core.jarvis_unified import UnifiedJarvis
+from core.logger import get_logger
+
+logger = get_logger(__name__)
 
 
-async def demo_intent_classification():
-    """Demo: Enhanced Intent Classification"""
+async def demo_basic_queries():
+    """Demo basic query processing."""
     print("\n" + "="*80)
-    print("🎯 DEMO 1: Enhanced Intent Classification")
-    print("="*80)
+    print("🎯 DEMO 1: Basic Query Processing")
+    print("="*80 + "\n")
     
-    classifier = EnhancedIntentClassifier()
+    jarvis = UnifiedJarvis(student_id="demo_user", personality="magical_mentor")
     
-    test_queries = [
-        "hey jarvis how do I create a python list",
-        "git clone the repo and npm install dependencies",
-        "what's the weather like in New York at 3:30 PM",
-        "create a custom block in Forge 1.19 with glowing effect",
-        "I don't understand this at all, it's too confusing"
+    queries = [
+        "Hello Jarvis!",
+        "What is Python?",
+        "I'm confused about loops",
+        "This is awesome! Show me more!",
     ]
     
-    for query in test_queries:
-        print(f"\n📝 Query: '{query}'")
-        intent = await classifier.classify(query)
-        print(f"   ✅ Intent: {intent.category.value}")
-        print(f"   📊 Confidence: {intent.confidence:.2f}")
-        
-        if intent.parameters.get('entities'):
-            print(f"   🏷️  Entities: {len(intent.parameters['entities'])} found")
-        
-        if intent.parameters.get('slots'):
-            print(f"   🎯 Slots: {list(intent.parameters['slots'].keys())}")
-        
-        if intent.parameters.get('cli_match'):
-            print(f"   💻 CLI Command: {intent.parameters['cli_match']}")
+    for query in queries:
+        print(f"\n👤 Student: {query}")
+        response = await jarvis.process_query(query)
+        print(f"🤖 Jarvis: {response}\n")
+        print("-" * 80)
+    
+    await jarvis.end_session()
 
 
-async def demo_semantic_matching():
-    """Demo: Semantic Matching"""
+async def demo_compound_queries():
+    """Demo compound query decomposition."""
     print("\n" + "="*80)
-    print("🔍 DEMO 2: Semantic Matching")
-    print("="*80)
+    print("🎯 DEMO 2: Compound Query Decomposition")
+    print("="*80 + "\n")
     
-    matcher = SemanticMatcher()
+    jarvis = UnifiedJarvis(student_id="demo_user")
     
-    # Test similarity
-    print("\n📊 Similarity Test:")
-    text1 = "How do I create a list in Python?"
-    text2 = "What's the way to make a Python list?"
-    similarity = await matcher.compute_similarity(text1, text2)
-    print(f"   Text 1: '{text1}'")
-    print(f"   Text 2: '{text2}'")
-    print(f"   ✅ Similarity: {similarity:.2f}")
+    compound_query = "Explain Python functions and then show me an example and compare with classes"
     
-    # Test fuzzy matching
-    print("\n🎯 Fuzzy Intent Matching:")
-    intents = {
-        'greeting': ['hello', 'hi', 'hey there', 'good morning'],
-        'farewell': ['goodbye', 'bye', 'see you later'],
-        'help': ['help me', 'I need assistance', 'can you help']
-    }
+    print(f"👤 Student: {compound_query}\n")
+    response = await jarvis.process_query(compound_query)
+    print(f"🤖 Jarvis:\n{response}\n")
     
-    test_query = "hiya"
-    result = await matcher.fuzzy_match(test_query, intents, threshold=0.5)
-    if result:
-        print(f"   Query: '{test_query}'")
-        print(f"   ✅ Matched Intent: {result[0]} (confidence: {result[1]:.2f})")
+    await jarvis.end_session()
 
 
-async def demo_sentiment_analysis():
-    """Demo: Sentiment Analysis"""
+async def demo_sentiment_adaptation():
+    """Demo sentiment-based response adaptation."""
     print("\n" + "="*80)
-    print("😊 DEMO 3: Sentiment Analysis")
-    print("="*80)
+    print("🎯 DEMO 3: Sentiment-Based Adaptation")
+    print("="*80 + "\n")
     
-    analyzer = SentimentAnalyzer()
+    jarvis = UnifiedJarvis(student_id="demo_user")
     
-    test_inputs = [
-        "I don't understand this at all, it's too confusing!",
-        "Got it! That makes perfect sense now.",
-        "This is awesome! I love learning this!",
-        "I'm stuck and need help"
+    emotional_queries = [
+        ("I'm so confused and stuck on this problem", "frustrated"),
+        ("Got it! This makes perfect sense now!", "confident"),
+        ("This is amazing! I love learning this!", "excited"),
+        ("This is too easy and boring", "bored"),
     ]
     
-    for text in test_inputs:
-        print(f"\n📝 Input: '{text}'")
-        sentiment = analyzer.analyze(text)
-        print(f"   😊 Mood: {sentiment['mood']}")
-        print(f"   📊 Confidence: {sentiment['confidence']:.2f}")
-        print(f"   🔥 Intensity: {sentiment['intensity']:.1f}")
+    for query, expected_mood in emotional_queries:
+        print(f"\n👤 Student: {query}")
+        print(f"   Expected mood: {expected_mood}")
         
-        recommendation = analyzer.get_tone_recommendation(sentiment)
-        print(f"   💡 Recommended Approach: {recommendation['approach']}")
+        response = await jarvis.process_query(query)
+        print(f"🤖 Jarvis: {response}\n")
+        print("-" * 80)
+    
+    await jarvis.end_session()
 
 
-async def demo_query_decomposition():
-    """Demo: Query Decomposition"""
+async def demo_knowledge_tracking():
+    """Demo knowledge graph and progress tracking."""
     print("\n" + "="*80)
-    print("🧩 DEMO 4: Query Decomposition")
-    print("="*80)
+    print("🎯 DEMO 4: Knowledge Graph & Progress Tracking")
+    print("="*80 + "\n")
     
-    decomposer = QueryDecomposer()
+    jarvis = UnifiedJarvis(student_id="demo_user")
     
-    complex_query = "First search for Python tutorials, then summarize the top 3, and finally create a quiz on the topics"
-    
-    print(f"\n📝 Complex Query: '{complex_query}'")
-    tasks = await decomposer.decompose(complex_query)
-    
-    print(f"\n✅ Decomposed into {len(tasks)} tasks:")
-    for i, task in enumerate(tasks):
-        deps = task['dependencies']
-        deps_str = f" (depends on task {deps[0]})" if deps else " (no dependencies)"
-        print(f"   {i+1}. {task['task']}{deps_str}")
-
-
-async def demo_contextual_memory():
-    """Demo: Contextual Memory"""
-    print("\n" + "="*80)
-    print("🧠 DEMO 5: Contextual Memory & Learning")
-    print("="*80)
-    
-    memory = EnhancedContextualMemory(max_short_term_turns=3)
-    
-    # Start session
-    memory.start_session("demo_session_001")
-    print("\n✅ Session started: demo_session_001")
-    
-    # Simulate conversation
-    interactions = [
-        ("Explain Python lists", "Lists are ordered collections...", {'intent': 'python'}),
-        ("How do I add items?", "Use the append() method...", {'intent': 'python', 'asked_for_example': True}),
-        ("Show me an example", "Here's an example: my_list.append(5)", {'intent': 'python', 'asked_for_example': True}),
-        ("That was helpful!", "Glad I could help!", {'intent': 'thanks'})
+    # Simulate learning progression
+    learning_queries = [
+        "Explain variables in Python",
+        "What are data types?",
+        "How do conditionals work?",
+        "Show me how to use loops",
+        "Explain functions",
     ]
     
-    print("\n📚 Simulating conversation:")
-    for user_input, assistant_response, metadata in interactions:
-        await memory.add_interaction(user_input, assistant_response, metadata)
-        print(f"   User: {user_input}")
-        print(f"   Jarvis: {assistant_response[:50]}...")
+    for query in learning_queries:
+        print(f"\n👤 Student: {query}")
+        response = await jarvis.process_query(query)
+        print(f"🤖 Jarvis: {response[:200]}...\n")
     
-    # Check what was learned
-    print("\n🎓 What Jarvis Learned:")
-    summary = await memory.get_learning_summary()
-    print(f"   Total Interactions: {summary['total_interactions']}")
-    print(f"   Current Topic: {summary['current_topic']}")
-    print(f"   Topic Continuity: {summary['topic_continuity']:.2f}")
-    
-    prefs = await memory.user_preferences.get_all_preferences()
-    if 'explanation_style' in prefs:
-        print(f"   Learned Preference: User prefers examples")
-
-
-async def demo_prompt_engineering():
-    """Demo: Enhanced Prompt Engineering"""
+    # Show progress
     print("\n" + "="*80)
-    print("✨ DEMO 6: Magical Prompt Engineering")
+    print("📊 LEARNING PROGRESS")
+    print("="*80 + "\n")
+    
+    progress = jarvis.get_student_progress()
+    print(f"Total Interactions: {progress.get('memory', {}).get('total_interactions', 0)}")
+    print(f"Emotional State: {progress.get('memory', {}).get('emotional_state', 'neutral')}")
+    
+    if 'knowledge' in progress:
+        kg_progress = progress['knowledge']
+        print(f"\nConcepts Mastered: {kg_progress.get('mastered_concepts', 0)}/{kg_progress.get('total_concepts', 0)}")
+        print(f"Progress: {kg_progress.get('progress_percentage', 0):.1f}%")
+    
+    # Show recommendations
+    print("\n" + "="*80)
+    print("💡 LEARNING RECOMMENDATIONS")
+    print("="*80 + "\n")
+    
+    recommendations = jarvis.get_learning_recommendations()
+    for rec in recommendations:
+        print(rec)
+    
+    await jarvis.end_session()
+
+
+async def demo_memory_and_context():
+    """Demo contextual memory and conversation continuity."""
+    print("\n" + "="*80)
+    print("🎯 DEMO 5: Contextual Memory & Conversation Continuity")
+    print("="*80 + "\n")
+    
+    jarvis = UnifiedJarvis(student_id="demo_user")
+    
+    conversation = [
+        "What is recursion?",
+        "Can you show me an example?",
+        "What if I want to use it with lists?",
+        "Thanks! That was helpful!",
+    ]
+    
+    for query in conversation:
+        print(f"\n👤 Student: {query}")
+        response = await jarvis.process_query(query)
+        print(f"🤖 Jarvis: {response}\n")
+        
+        # Show short-term memory
+        if jarvis.enhanced_memory:
+            context = jarvis.enhanced_memory.get_short_term_context()
+            print(f"   [Memory: {len(context)} recent exchanges]")
+        
+        print("-" * 80)
+    
+    await jarvis.end_session()
+
+
+async def demo_technical_queries():
+    """Demo technical query handling."""
+    print("\n" + "="*80)
+    print("🎯 DEMO 6: Technical Query Handling")
+    print("="*80 + "\n")
+    
+    jarvis = UnifiedJarvis(student_id="demo_user")
+    
+    technical_queries = [
+        "Create a Minecraft mod using Forge",
+        "Run npm install express",
+        "Write a Python function to sort a list",
+        "How do I use git commit?",
+    ]
+    
+    for query in technical_queries:
+        print(f"\n👤 Student: {query}")
+        response = await jarvis.process_query(query)
+        print(f"🤖 Jarvis: {response}\n")
+        print("-" * 80)
+    
+    await jarvis.end_session()
+
+
+async def demo_system_status():
+    """Demo system status and diagnostics."""
+    print("\n" + "="*80)
+    print("🎯 DEMO 7: System Status & Diagnostics")
+    print("="*80 + "\n")
+    
+    jarvis = UnifiedJarvis(student_id="demo_user")
+    
+    status = jarvis.get_status()
+    
+    print("System Status:")
+    print(f"  Student ID: {status['student_id']}")
+    print(f"  Personality: {status['personality']}")
+    print(f"\nComponents:")
+    
+    for component, loaded in status['components'].items():
+        status_icon = "✅" if loaded else "❌"
+        print(f"  {status_icon} {component.replace('_', ' ').title()}")
+    
+    print(f"\nAll Features Enabled: {'✅' if status['features_enabled'] else '❌'}")
+
+
+async def run_all_demos():
+    """Run all demo scenarios."""
+    print("\n" + "="*80)
+    print("🚀 JARVIS ENHANCED FEATURES - COMPREHENSIVE DEMO")
     print("="*80)
     
-    from core.models import Intent, IntentCategory
+    demos = [
+        ("Basic Queries", demo_basic_queries),
+        ("Compound Queries", demo_compound_queries),
+        ("Sentiment Adaptation", demo_sentiment_adaptation),
+        ("Knowledge Tracking", demo_knowledge_tracking),
+        ("Memory & Context", demo_memory_and_context),
+        ("Technical Queries", demo_technical_queries),
+        ("System Status", demo_system_status),
+    ]
     
-    engine = EnhancedPromptEngine(personality="magical")
+    for name, demo_func in demos:
+        try:
+            await demo_func()
+            print(f"\n✅ {name} demo completed\n")
+        except Exception as e:
+            print(f"\n❌ {name} demo failed: {e}\n")
+            logger.error(f"Demo failed: {e}", exc_info=True)
     
-    # Create sample intent
-    intent = Intent(
-        category=IntentCategory.CODE,
-        confidence=0.9,
-        parameters={},
-        context={}
-    )
-    
-    query = "How do I create a custom Minecraft block in Forge?"
-    
-    print(f"\n📝 Query: '{query}'")
-    print("\n🪄 Building magical prompt with:")
-    print("   - Codeex personality")
-    print("   - Few-shot examples")
-    print("   - Chain-of-thought structure")
-    print("   - Context awareness")
-    
-    prompt = engine.build_prompt(
-        query=query,
-        intent=intent,
-        context={'mc_version': '1.19', 'loader': 'forge'}
-    )
-    
-    print(f"\n✅ Generated prompt ({len(prompt)} characters)")
-    print("\n📄 Prompt Preview:")
-    print("-" * 80)
-    print(prompt[:500] + "..." if len(prompt) > 500 else prompt)
-    print("-" * 80)
-
-
-async def demo_integration():
-    """Demo: Complete Integration"""
     print("\n" + "="*80)
-    print("🚀 DEMO 7: Complete Integration Workflow")
+    print("🎉 ALL DEMOS COMPLETED!")
+    print("="*80 + "\n")
+
+
+async def interactive_mode():
+    """Interactive mode for testing."""
+    print("\n" + "="*80)
+    print("🎮 JARVIS ENHANCED - INTERACTIVE MODE")
     print("="*80)
+    print("\nType 'quit' or 'exit' to end session")
+    print("Type 'status' to see system status")
+    print("Type 'progress' to see learning progress")
+    print("Type 'help' for more commands\n")
     
-    # Initialize all components
-    classifier = EnhancedIntentClassifier()
-    prompt_engine = EnhancedPromptEngine()
-    memory = EnhancedContextualMemory()
-    sentiment_analyzer = SentimentAnalyzer()
+    jarvis = UnifiedJarvis(student_id="interactive_user", personality="magical_mentor")
     
-    # Start session
-    memory.start_session("integration_demo")
-    
-    # Process a query
-    query = "I'm confused about Python lists, can you explain with examples?"
-    
-    print(f"\n📝 Processing Query: '{query}'")
-    print("\n🔄 Pipeline Steps:")
-    
-    # Step 1: Classify intent
-    print("   1️⃣  Classifying intent...")
-    intent = await classifier.classify(query)
-    print(f"      ✅ Intent: {intent.category.value} (confidence: {intent.confidence:.2f})")
-    
-    # Step 2: Analyze sentiment
-    print("   2️⃣  Analyzing sentiment...")
-    sentiment = sentiment_analyzer.analyze(query)
-    print(f"      ✅ Mood: {sentiment['mood']} (intensity: {sentiment['intensity']:.1f})")
-    
-    # Step 3: Get context
-    print("   3️⃣  Retrieving context...")
-    context = await memory.get_context_for_query(query)
-    print(f"      ✅ Context retrieved (preferences, history)")
-    
-    # Step 4: Build prompt
-    print("   4️⃣  Building magical prompt...")
-    prompt = prompt_engine.build_prompt(
-        query=query,
-        intent=intent,
-        context=context,
-        user_preferences=context['user_preferences']
-    )
-    print(f"      ✅ Prompt built ({len(prompt)} characters)")
-    
-    # Step 5: Simulate response and memory update
-    print("   5️⃣  Generating response...")
-    response = "Lists in Python are ordered collections. Here's an example: my_list = [1, 2, 3]"
-    print(f"      ✅ Response generated")
-    
-    # Step 6: Update memory
-    print("   6️⃣  Updating memory...")
-    await memory.add_interaction(
-        query,
-        response,
-        {'intent': intent.category.value, 'asked_for_example': True}
-    )
-    print(f"      ✅ Memory updated, preferences learned")
-    
-    print("\n✅ Complete workflow executed successfully!")
+    while True:
+        try:
+            query = input("\n👤 You: ").strip()
+            
+            if not query:
+                continue
+            
+            if query.lower() in ['quit', 'exit', 'bye']:
+                print("\n🤖 Jarvis: Goodbye! Saving your progress...\n")
+                summary = await jarvis.end_session()
+                if summary:
+                    print(f"Session Duration: {summary.get('duration', 0):.0f}s")
+                    print(f"Total Exchanges: {summary.get('exchanges', 0)}")
+                break
+            
+            if query.lower() == 'status':
+                status = jarvis.get_status()
+                print("\n🤖 Jarvis: System Status:")
+                for component, loaded in status['components'].items():
+                    print(f"  {'✅' if loaded else '❌'} {component}")
+                continue
+            
+            if query.lower() == 'progress':
+                progress = jarvis.get_student_progress()
+                print("\n🤖 Jarvis: Your Progress:")
+                print(f"  Interactions: {progress.get('memory', {}).get('total_interactions', 0)}")
+                print(f"  Emotional State: {progress.get('memory', {}).get('emotional_state', 'neutral')}")
+                continue
+            
+            if query.lower() == 'help':
+                print("\n🤖 Jarvis: Available Commands:")
+                print("  quit/exit - End session")
+                print("  status - Show system status")
+                print("  progress - Show learning progress")
+                print("  help - Show this message")
+                continue
+            
+            # Process query
+            response = await jarvis.process_query(query)
+            print(f"\n🤖 Jarvis: {response}")
+            
+        except KeyboardInterrupt:
+            print("\n\n🤖 Jarvis: Session interrupted. Saving progress...\n")
+            await jarvis.end_session()
+            break
+        except Exception as e:
+            print(f"\n❌ Error: {e}")
+            logger.error(f"Interactive mode error: {e}", exc_info=True)
 
 
 async def main():
-    """Run all demos"""
-    print("\n" + "="*80)
-    print("🎉 JARVIS 2.0 ENTERPRISE EDITION - FEATURE DEMO")
-    print("="*80)
-    print("\nDemonstrating all enhanced features...")
+    """Main entry point."""
+    import argparse
     
-    try:
-        await demo_intent_classification()
-        await demo_semantic_matching()
-        await demo_sentiment_analysis()
-        await demo_query_decomposition()
-        await demo_contextual_memory()
-        await demo_prompt_engineering()
-        await demo_integration()
-        
-        print("\n" + "="*80)
-        print("✅ ALL DEMOS COMPLETED SUCCESSFULLY!")
-        print("="*80)
-        print("\n🎓 Key Takeaways:")
-        print("   • Intent classification with 95%+ accuracy")
-        print("   • Semantic matching for fuzzy queries")
-        print("   • Sentiment-aware responses")
-        print("   • Complex query decomposition")
-        print("   • Adaptive learning from interactions")
-        print("   • Magical, context-aware prompts")
-        print("   • Complete integration pipeline")
-        print("\n🚀 JARVIS 2.0 is ready for production!")
-        print("\n💡 Next Steps:")
-        print("   1. Run tests: pytest tests/test_jarvis_enhanced.py -v")
-        print("   2. Read docs: JARVIS_UPGRADES_COMPLETE.md")
-        print("   3. Start using: python -m core.main start")
-        print("\n" + "="*80)
-        
-    except Exception as e:
-        print(f"\n❌ Error during demo: {e}")
-        import traceback
-        traceback.print_exc()
+    parser = argparse.ArgumentParser(description="JARVIS Enhanced Features Demo")
+    parser.add_argument(
+        '--mode',
+        choices=['all', 'interactive', 'basic', 'compound', 'sentiment', 'knowledge', 'memory', 'technical', 'status'],
+        default='all',
+        help='Demo mode to run'
+    )
+    parser.add_argument('--diagnose', action='store_true', help='Run diagnostics')
+    
+    args = parser.parse_args()
+    
+    if args.diagnose:
+        await demo_system_status()
+        return
+    
+    mode_map = {
+        'all': run_all_demos,
+        'interactive': interactive_mode,
+        'basic': demo_basic_queries,
+        'compound': demo_compound_queries,
+        'sentiment': demo_sentiment_adaptation,
+        'knowledge': demo_knowledge_tracking,
+        'memory': demo_memory_and_context,
+        'technical': demo_technical_queries,
+        'status': demo_system_status,
+    }
+    
+    demo_func = mode_map.get(args.mode, run_all_demos)
+    await demo_func()
 
 
 if __name__ == "__main__":
-    print("\n🤖 Starting JARVIS 2.0 Enhanced Features Demo...")
-    print("⏳ This may take a moment to load models...\n")
-    
     asyncio.run(main())

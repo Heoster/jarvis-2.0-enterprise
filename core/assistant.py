@@ -253,7 +253,7 @@ class Assistant:
                 user_input=text,
                 assistant_response=response.text,
                 metadata={
-                    'intent': intent.name,
+                    'intent': intent.category.value,
                     'confidence': intent.confidence,
                     'execution_time': execution_time
                 }

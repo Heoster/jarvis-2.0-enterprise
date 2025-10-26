@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-JARVIS MASTER - Complete AI Assistant with ALL Features Working
-Unified intelligent brain combining all capabilities into one powerful system
+JARVIS MASTER - Iron Man AI Assistant with ALL Features
+True Iron Man JARVIS with enhanced capabilities, automatic learning, and real-time intelligence
 """
 
 import asyncio
@@ -12,6 +12,9 @@ from typing import Dict, Any, Optional
 # Core imports
 from core.logger import get_logger, setup_logging
 from core.jarvis_brain import JarvisBrain
+from core.iron_man_assistant import get_iron_man_jarvis
+from core.smart_knowledge_integration import get_knowledge_integrator
+from core.automatic_training import get_training_system
 from core.web_scraper import get_web_scraper
 from core.indian_apis import get_indian_api
 from core.realtime_data import RealTimeDataManager
@@ -23,18 +26,21 @@ logger = get_logger(__name__)
 
 class JarvisMaster:
     """
-    Master Jarvis - Complete AI Assistant
+    Master JARVIS - Iron Man AI Assistant
     
     Features:
-    - Advanced Web Search & Scraping (DuckDuckGo + BeautifulSoup)
-    - Real-time Data (Weather, News, Wikipedia)
-    - Indian APIs (Finance INR, Railway, Mutual Funds, Entertainment)
-    - Transformers + LangChain for intelligent responses
-    - Natural Language Understanding
-    - Contextual Memory & Learning
-    - API Routing (Grammar, Quiz, Feedback)
-    - Math Execution
-    - Multi-modal capabilities
+    - 🤖 Iron Man Personality & Responses
+    - 🧠 Automatic Learning from Positive Feedback
+    - 🔍 Advanced Web Search & Scraping
+    - 💰 Real-time Financial Data (Bitcoin, Currency, Mutual Funds)
+    - 🚂 Indian Railway Information
+    - 🎭 Entertainment (Jokes, Quotes, Images)
+    - ⏰ Time/Date Awareness
+    - 💬 Smart Conversational Editing
+    - 📚 Smart Knowledge Integration
+    - 🎯 Proactive Assistance
+    - 🔧 Enhanced Error Handling
+    - 📊 Comprehensive Monitoring
     """
     
     def __init__(self):
@@ -46,9 +52,20 @@ class JarvisMaster:
         # Get configuration
         self.config = get_config()
         
-        # Initialize core brain (Transformers + LangChain)
-        logger.info("🧠 Loading Jarvis Brain (Transformers + LangChain)...")
+        # Initialize core brain (Enhanced with Iron Man features)
+        logger.info("🤖 Loading Iron Man JARVIS Brain...")
         self.brain = JarvisBrain()
+        
+        # Initialize Iron Man JARVIS (will be loaded async)
+        self.iron_man_jarvis = None
+        
+        # Initialize knowledge integrator
+        logger.info("📚 Initializing Smart Knowledge Integration...")
+        self.knowledge_integrator = get_knowledge_integrator()
+        
+        # Initialize automatic training system
+        logger.info("🧠 Initializing Automatic Learning System...")
+        self.training_system = get_training_system()
         
         # Initialize real-time data manager
         logger.info("🌐 Initializing Real-time Data Manager...")
@@ -57,7 +74,7 @@ class JarvisMaster:
             news_api_key=self.config.apis.news.api_key
         )
         
-        # Web scraper and Indian APIs will be initialized async
+        # Components will be initialized async
         self.web_scraper = None
         self.indian_api = None
         self.api_router = None
@@ -65,12 +82,17 @@ class JarvisMaster:
         # Session management
         self.session_id = None
         self.interaction_count = 0
+        self.feedback_mode = True  # Enable automatic learning
         
         logger.info("✅ JARVIS MASTER initialized successfully")
         logger.info("="*80)
     
     async def initialize_async_components(self):
         """Initialize async components"""
+        if self.iron_man_jarvis is None:
+            logger.info("🤖 Initializing Iron Man JARVIS...")
+            self.iron_man_jarvis = await get_iron_man_jarvis()
+        
         if self.web_scraper is None:
             logger.info("🔍 Initializing Web Scraper...")
             self.web_scraper = await get_web_scraper()
@@ -82,6 +104,10 @@ class JarvisMaster:
         if self.api_router is None:
             logger.info("🔀 Initializing API Router...")
             self.api_router = get_api_router()
+        
+        # Initialize knowledge integration
+        logger.info("📚 Integrating Knowledge Base...")
+        await self.knowledge_integrator.integrate_all_knowledge()
     
     async def process_query(self, query: str) -> str:
         """
@@ -105,14 +131,17 @@ class JarvisMaster:
             # Build comprehensive context
             context = await self._build_context(query)
             
-            # Generate response using Jarvis Brain
-            # The brain handles:
+            # Generate response using Enhanced JARVIS Brain
+            # The brain now handles:
+            # - Iron Man personality and responses
+            # - Smart conversational editing
+            # - Time/date awareness
+            # - Automatic learning integration
             # - Web search & scraping
             # - API routing
             # - Indian APIs
             # - Real-time data
-            # - Transformers + LangChain
-            # - Natural language understanding
+            # - Enhanced knowledge integration
             response = await self.brain.generate_response(query, context)
             
             logger.info(f"✅ Response generated successfully")
@@ -202,32 +231,84 @@ class JarvisMaster:
         logger.info(f"📝 Session started: {self.session_id}")
     
     async def get_greeting(self) -> str:
-        """Get personalized greeting"""
-        return await self.brain.generate_greeting()
+        """Get Iron Man style greeting"""
+        if self.iron_man_jarvis:
+            return await self.iron_man_jarvis.get_iron_man_greeting()
+        else:
+            return await self.brain.get_enhanced_greeting()
     
     async def get_farewell(self) -> str:
         """Get personalized farewell"""
         return await self.brain.generate_farewell()
     
     def get_status(self) -> Dict[str, Any]:
-        """Get complete system status"""
-        brain_status = self.brain.get_status()
+        """Get complete Iron Man JARVIS status"""
+        brain_status = self.brain.get_enhanced_status()
         
         return {
-            'system': 'JARVIS MASTER',
-            'status': 'operational',
+            'system': 'JARVIS MASTER - Iron Man Edition',
+            'version': '2.0 - Enhanced',
+            'status': 'Fully Operational',
+            'personality': 'Iron Man JARVIS',
             'session_id': self.session_id,
             'interactions': self.interaction_count,
+            'feedback_mode': self.feedback_mode,
             'brain': brain_status,
-            'features': {
+            'enhanced_features': {
+                'iron_man_personality': self.iron_man_jarvis is not None,
+                'automatic_learning': True,
+                'smart_knowledge_integration': True,
+                'time_date_awareness': True,
+                'smart_query_editing': True,
+                'proactive_assistance': True,
                 'web_scraping': self.web_scraper is not None,
                 'indian_apis': self.indian_api is not None,
                 'api_routing': self.api_router is not None,
                 'realtime_data': True,
                 'transformers': brain_status.get('transformer_loaded', False),
                 'langchain': brain_status.get('langchain_enabled', False)
-            }
+            },
+            'capabilities': [
+                '🤖 Iron Man Personality',
+                '🧠 Automatic Learning',
+                '⏰ Time/Date Awareness', 
+                '💬 Smart Conversation',
+                '🔍 Advanced Web Search',
+                '💰 Financial Data (INR)',
+                '🚂 Railway Information',
+                '🎭 Entertainment Content',
+                '📚 Knowledge Integration',
+                '🎯 Proactive Assistance'
+            ]
         }
+    
+    async def process_feedback(self, query: str, response: str, feedback: str) -> str:
+        """
+        Process user feedback and learn from positive responses
+        
+        Args:
+            query: Original query
+            response: JARVIS response
+            feedback: User feedback
+            
+        Returns:
+            Feedback acknowledgment
+        """
+        if not self.feedback_mode:
+            return "Feedback noted, but learning is currently disabled."
+        
+        try:
+            # Process through brain's feedback system
+            learning_triggered = await self.brain.process_feedback(query, response, feedback)
+            
+            if learning_triggered:
+                return "✅ Thank you for the positive feedback, sir! I've learned from this interaction and will improve my responses."
+            else:
+                return "📝 Feedback recorded, sir. I'm continuously learning from our interactions."
+                
+        except Exception as e:
+            logger.error(f"Feedback processing failed: {e}")
+            return "⚠️ I encountered an issue processing your feedback, but I've noted it for review."
     
     async def shutdown(self):
         """Gracefully shutdown"""
@@ -311,6 +392,13 @@ async def interactive_mode():
             print()
             response = await jarvis.process_query(user_input)
             print(f"\nJarvis: {response}\n")
+            
+            # Ask for feedback if in feedback mode
+            if jarvis.feedback_mode and jarvis.interaction_count % 3 == 0:  # Every 3rd interaction
+                feedback_input = input("💭 How was that response? (good/bad/skip): ").strip().lower()
+                if feedback_input and feedback_input != 'skip':
+                    feedback_response = await jarvis.process_feedback(user_input, response, feedback_input)
+                    print(f"\n{feedback_response}\n")
             
         except KeyboardInterrupt:
             print("\n\n👋 Interrupted. Goodbye!")
